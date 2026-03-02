@@ -1,0 +1,57 @@
+{
+    "global": {
+        "scale": 1.0,
+        "headerIconScale": 1.5,
+        "defaultColor": "#ffffff",
+        "colorize": true,
+        "excludeFromColorization": [
+            "app_main"
+        ]
+    },
+    "custom_colors": {
+        "recommended": "#27ae60",
+        "advanced": "#f4d838",
+        "sudo": "#da4453",
+        "ssd": "#ffffff",
+        "kill": "#ffffff",
+        "running": "#ffffff"
+    },
+    "icons": {
+        "advanced": "advanced.svg",
+        "app_main": "app-main.svg",
+        "appimage_manager": "appimage_manager.svg",
+        "boot_audit": "boot_audit.svg",
+        "check_update": "check_update.svg",
+        "clean": "clean.svg",
+        "confirm": "confirm.svg",
+        "corpse_cleaner": "corpse_cleaner.svg",
+        "custom_scripts": "custom_scripts.svg",
+        "delete": "clean.svg",
+        "error": "error.svg",
+        "favorite": "favorite.svg",
+        "home": "home.svg",
+        "kill": "kill.svg",
+        "maintain_system": "maintain_system.svg",
+        "maintain_system_header": "maintain_system.svg",
+        "maintain": "maintain_system.svg",
+        "monitor": "monitor.svg",
+        "package_manager": "package_manager.svg",
+        "package_update_available": "package_update_available.svg",
+        "quit": "quit.svg",
+        "ram": "ram.svg",
+        "reboot": "reboot.svg",
+        "recommended": "recommended.svg",
+        "run": "run.svg",
+        "running": "running.svg",
+        "scripts": "custom_scripts.svg",
+        "search": "search.svg",
+        "settings": "settings.svg",
+        "ssd": "ssd.svg",
+        "storage": "ssd.svg",
+        "success": "success.svg",
+        "sudo": "sudo.svg",
+        "trash": "clean.svg",
+        "url": "url.svg",
+        "warning": "warning.svg"
+    }
+}

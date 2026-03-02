@@ -1,0 +1,175 @@
+import os
+from PyQt6.QtCore import QObject, QSettings, pyqtProperty, pyqtSignal, pyqtSlot
+
+class SettingsManager(QObject):
+    cornerRadiusChanged = pyqtSignal()
+    packageCacheCountChanged = pyqtSignal()
+    journalLogAgeChanged = pyqtSignal()
+    ghostConfigBlacklistChanged = pyqtSignal()
+    favoriteTasksChanged = pyqtSignal()
+    developerModeChanged = pyqtSignal()
+    corpseCleanerCustomPathsChanged = pyqtSignal()
+    scriptsDirChanged = pyqtSignal()
+    aurHelperChanged = pyqtSignal()
+    checkUpdatesOnStartupChanged = pyqtSignal()
+    confirmPackageRemovalChanged = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.settings = QSettings(QSettings.Format.IniFormat, QSettings.Scope.UserScope, "MaintainerTeam", "Maintainer")
+        
+        # Initialize defaults if they don't exist
+        if not self.settings.contains("cornerRadius"):
+            self.settings.setValue("cornerRadius", 8)
+        if not self.settings.contains("packageCacheCount"):
+            self.settings.setValue("packageCacheCount", 3)
+        if not self.settings.contains("journalLogAge"):
+            self.settings.setValue("journalLogAge", "2weeks")
+        if not self.settings.contains("ghostConfigBlacklist"):
+            self.settings.setValue("ghostConfigBlacklist", "obs-studio,kde,plasma")
+        if not self.settings.contains("favoriteTasks"):
+            self.settings.setValue("favoriteTasks", ["Clear Pacman Cache"])
+        if not self.settings.contains("developerMode"):
+            self.settings.setValue("developerMode", False)
+        if not self.settings.contains("corpseCleanerCustomPaths"):
+            self.settings.setValue("corpseCleanerCustomPaths", "")
+        if not self.settings.contains("scriptsDir"):
+            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            self.settings.setValue("scriptsDir", os.path.join(project_root, "scripts"))
+        if not self.settings.contains("aurHelper"):
+            self.settings.setValue("aurHelper", "pacman")
+        if not self.settings.contains("checkUpdatesOnStartup"):
+            self.settings.setValue("checkUpdatesOnStartup", True)
+        if not self.settings.contains("confirmPackageRemoval"):
+            self.settings.setValue("confirmPackageRemoval", True)
+
+    @pyqtProperty(int, notify=cornerRadiusChanged)
+    def cornerRadius(self):
+        return int(self.settings.value("cornerRadius", 8))
+
+    @cornerRadius.setter
+    def cornerRadius(self, value):
+        if self.cornerRadius != value:
+            self.settings.setValue("cornerRadius", value)
+            self.cornerRadiusChanged.emit()
+
+    @pyqtProperty(int, notify=packageCacheCountChanged)
+    def packageCacheCount(self):
+        return int(self.settings.value("packageCacheCount", 3))
+
+    @packageCacheCount.setter
+    def packageCacheCount(self, value):
+        if self.packageCacheCount != value:
+            self.settings.setValue("packageCacheCount", value)
+            self.packageCacheCountChanged.emit()
+
+    @pyqtProperty(str, notify=journalLogAgeChanged)
+    def journalLogAge(self):
+        return str(self.settings.value("journalLogAge", "2weeks"))
+
+    @journalLogAge.setter
+    def journalLogAge(self, value):
+        if self.journalLogAge != value:
+            self.settings.setValue("journalLogAge", value)
+            self.journalLogAgeChanged.emit()
+
+    @pyqtProperty(str, notify=ghostConfigBlacklistChanged)
+    def ghostConfigBlacklist(self):
+        return str(self.settings.value("ghostConfigBlacklist", "obs-studio,kde,plasma"))
+
+    @ghostConfigBlacklist.setter
+    def ghostConfigBlacklist(self, value):
+        if self.ghostConfigBlacklist != value:
+            self.settings.setValue("ghostConfigBlacklist", value)
+            self.ghostConfigBlacklistChanged.emit()
+
+    @pyqtProperty(list, notify=favoriteTasksChanged)
+    def favoriteTasks(self):
+        val = self.settings.value("favoriteTasks", [])
+        if isinstance(val, str):
+            return [val] if val else []
+        if val is None:
+            return []
+        return list(val)
+
+    @favoriteTasks.setter
+    def favoriteTasks(self, value):
+        # value comes in as a Javascript array (list in python)
+        if self.favoriteTasks != value:
+            self.settings.setValue("favoriteTasks", value)
+            self.favoriteTasksChanged.emit()
+
+    @pyqtProperty(bool, notify=developerModeChanged)
+    def developerMode(self):
+        val = self.settings.value("developerMode", False)
+        if isinstance(val, str):
+            return val.lower() == 'true'
+        return bool(val)
+
+    @developerMode.setter
+    def developerMode(self, value):
+        if self.developerMode != value:
+            self.settings.setValue("developerMode", bool(value))
+            self.developerModeChanged.emit()
+
+    @pyqtProperty(str, notify=corpseCleanerCustomPathsChanged)
+    def corpseCleanerCustomPaths(self):
+        return self.settings.value("corpseCleanerCustomPaths", "")
+
+    @corpseCleanerCustomPaths.setter
+    def corpseCleanerCustomPaths(self, value):
+        if self.corpseCleanerCustomPaths != value:
+            self.settings.setValue("corpseCleanerCustomPaths", str(value))
+            self.corpseCleanerCustomPathsChanged.emit()
+
+    @pyqtProperty(str, notify=scriptsDirChanged)
+    def scriptsDir(self):
+        return str(self.settings.value("scriptsDir", ""))
+
+    @scriptsDir.setter
+    def scriptsDir(self, value):
+        if self.scriptsDir != value:
+            self.settings.setValue("scriptsDir", str(value))
+            self.scriptsDirChanged.emit()
+
+    @pyqtProperty(str, notify=aurHelperChanged)
+    def aurHelper(self):
+        return str(self.settings.value("aurHelper", "pacman"))
+
+    @aurHelper.setter
+    def aurHelper(self, value):
+        if self.aurHelper != value:
+            self.settings.setValue("aurHelper", str(value))
+            self.aurHelperChanged.emit()
+
+    appImageDirChanged = pyqtSignal()
+    @pyqtProperty(str, notify=appImageDirChanged)
+    def appImageDir(self):
+        default = os.path.expanduser("~/Applications")
+        return str(self.settings.value("appImageDir", default))
+
+    @appImageDir.setter
+    def appImageDir(self, value):
+        if self.appImageDir != value:
+            self.settings.setValue("appImageDir", str(value))
+            self.appImageDirChanged.emit()
+
+    @pyqtProperty(bool, notify=checkUpdatesOnStartupChanged)
+    def checkUpdatesOnStartup(self):
+        return bool(self.settings.value("checkUpdatesOnStartup", True, type=bool))
+
+    @checkUpdatesOnStartup.setter
+    def checkUpdatesOnStartup(self, value):
+        if self.checkUpdatesOnStartup != value:
+            self.settings.setValue("checkUpdatesOnStartup", bool(value))
+            self.checkUpdatesOnStartupChanged.emit()
+
+    @pyqtProperty(bool, notify=confirmPackageRemovalChanged)
+    def confirmPackageRemoval(self):
+        return bool(self.settings.value("confirmPackageRemoval", True, type=bool))
+
+    @confirmPackageRemoval.setter
+    def confirmPackageRemoval(self, value):
+        if self.confirmPackageRemoval != value:
+            self.settings.setValue("confirmPackageRemoval", bool(value))
+            self.confirmPackageRemovalChanged.emit()

@@ -1,0 +1,111 @@
+{
+    "main": {
+        "title": "Maintainer",
+        "home": "Home",
+        "monitor": "Monitor",
+        "settings": "Settings"
+    },
+    "landing": {
+        "title": "Home",
+        "app_name": "Arch System Maintainer",
+        "app_description": "A comprehensive system maintenance tool tailored for Linux and Arch-based distributions. Keep your system clean, fast, and optimized.",
+        "ssd_health": "SSD health",
+        "ram_available": "RAM available",
+        "storage_available": "Storage available",
+        "run_recommended": "Run Recommended Tasks",
+        "potential_savings": "Potential space savings: ",
+        "reclaimed_suffix": " reclaimed"
+    },
+    "running": {
+        "title": "Running tasks",
+        "progressbar": "Progressbar",
+        "waiting": "Waiting for tasks...",
+        "running_append": " ...."
+    },
+    "finished": {
+        "title": "All tasks finished",
+        "unscanned": "Ready to clean",
+        "corpses": "Corpses"
+    },
+    "monitor": {
+        "title": "System Monitor",
+        "overview": "Overview",
+        "cpu": "CPU",
+        "memory": "Memory",
+        "swap": "Swap",
+        "disks": "Disks",
+        "networks": "Networks",
+        "applications": "Applications",
+        "processes": "Processes",
+        "name": "Name",
+        "download": "Download",
+        "upload": "Upload",
+        "ipv4": "IPv4"
+    },
+    "settings": {
+        "title": "Settings",
+        "description": "Customize application behavior, set maintenance thresholds, and manage custom scan paths.",
+        "label_caches": "Package Caches to Keep:",
+        "label_log_age": "System Log Age:",
+        "label_ghost_blacklist": "Corpse Cleaner Blacklist (comma-separated):",
+        "placeholder_ghost": "UUIDs or Paths (comma-separated)...",
+        "label_custom_paths": "Additional Corpse Cleaner Paths (comma-separated):",
+        "placeholder_custom_paths": "/path/to/cache, /another/path",
+        "label_developer_mode": "Developer Mode",
+        "favorite_tasks_title": "Select Favorite Tasks",
+        "label_scripts_dir": "Path to scripts",
+        "placeholder_scripts_dir": "/path/to/my/scripts"
+    },
+    "corpse_cleaner": {
+        "title": "Corpse Cleaner",
+        "description": "Deep scan for leftover configuration and data directories from applications that are no longer installed on your system.",
+        "placeholder_unscanned": "Click 'Scan Now' to find corpses.",
+        "placeholder_empty": "No corpses found.",
+        "btn_scan": "Scan Now",
+        "results_title": "Corpses Found",
+        "total_selected": "Total selected: ",
+        "btn_clean": "Clean Selected Corpses",
+        "status_cleaning": "Cleaning..."
+    },
+    "boot_audit": {
+        "title": "Boot Audit",
+        "description": "Identify and carefully remove ghost boot entries pointing to missing files on your EFI partition. Warning: Deleting active entries will break your boot process! Only remove old UUIDs or obsolete OS titles.",
+        "placeholder_unscanned": "Click 'Scan EFI' to audit boot entries.",
+        "placeholder_empty": "No ghost entries found. Your EFI is clean.",
+        "btn_scan": "Scan EFI",
+        "results_title": "Boot Entries Found",
+        "total_selected": "Entries selected: ",
+        "btn_clean": "Remove Selected Entries",
+        "status_cleaning": "Removing...",
+        "confirm_title": "WARNING: Confirm Boot Entry Removal",
+        "confirm_description": "You are about to permanently delete EFI boot variables from your system motherboard. If you remove the entry your system is currently using to boot, your computer will fail to start on next reboot. Are you absolutely sure?",
+        "btn_remove_now": "Remove Entries Now"
+    },
+    "clean_system": {
+        "title": "Clean System Files",
+        "description": "Safely remove package caches, system logs, and orphan dependencies to reclaim valuable disk space."
+    },
+    "maintain_system": {
+        "title": "System Maintenance",
+        "description": "Advanced tools to check system health, repair package manager locks, and manage failed system services."
+    },
+    "scripts": {
+        "title": "Custom Scripts",
+        "description": "Execute your own maintenance and automation scripts safely through the Maintainer interface."
+    },
+    "selection": {
+        "recommended_label": " (recommended)",
+        "btn_review": "Review",
+        "space_to_reclaim": "Space to reclaim: ",
+        "selected_count_prefix": " (",
+        "selected_count_suffix": " selected)",
+        "out_of_prefix": " out of ",
+        "tasks_selected_suffix": " tasks selected",
+        "btn_confirm": "Confirm tasks",
+        "btn_abort": "Abort",
+        "review_folders_title": "Review Folders",
+        "tooltip_recommended": "Safe recommended tasks for regular use.",
+        "tooltip_advanced": "Potentially risky tasks, be cautious.",
+        "tooltip_sudo": "This action requires superuser access."
+    }
+}

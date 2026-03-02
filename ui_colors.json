@@ -1,0 +1,13 @@
+{
+    "window_darker_multiplier": 1.0,
+    "sidebar_darker_multiplier": 1.4,
+    "queue_darker_multiplier": 1.4,
+    "description_darker_multiplier": 1.4,
+    "window_background_hex": "",
+    "sidebar_background_hex": "",
+    "queue_background_hex": "",
+    "description_background_hex": "",
+    "defaultColor": "#ffffff",
+    "text_color_hex": "",
+    "neutral_text_hex": ""
+}
