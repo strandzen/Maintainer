@@ -2,7 +2,7 @@ import sys
 import os
 from PyQt6.QtGui import QGuiApplication, QIcon
 from PyQt6.QtQml import QQmlApplicationEngine
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QUrl
 
 from models.system_health import SystemHealth
 from models.task_engine import TaskEngine
@@ -16,6 +16,16 @@ from models.appimage_manager import AppImageManager
 from models.appimage_hub import AppImageHubManager
 from models.package_manager import PackageManager
 from models.ui_fonts_manager import UIFontsManager
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 def main():
     # Set up the application
@@ -33,24 +43,24 @@ def main():
     settings_manager = SettingsManager(app)
 
     # Load tasks from configuration
-    config_path = os.path.join(os.path.dirname(__file__), "tasks_config.json")
+    config_path = resource_path("tasks_config.json")
     task_registry = TaskRegistry(config_path, app, settings_manager)
     
     # Load UI strings and icons
-    ui_strings_path = os.path.join(os.path.dirname(__file__), "ui_strings.json")
+    ui_strings_path = resource_path("ui_strings.json")
     ui_strings_manager = UIStringsManager(ui_strings_path, app)
     
-    ui_icons_path = os.path.join(os.path.dirname(__file__), "ui_icons.json")
+    ui_icons_path = resource_path("ui_icons.json")
     ui_icons_manager = UIIconsManager(ui_icons_path, app)
 
-    ui_colors_path = os.path.join(os.path.dirname(__file__), "ui_colors.json")
+    ui_colors_path = resource_path("ui_colors.json")
     ui_colors_manager = UIColorsManager(ui_colors_path, app)
     
-    ui_fonts_path = os.path.join(os.path.dirname(__file__), "ui_fonts.json")
+    ui_fonts_path = resource_path("ui_fonts.json")
     ui_fonts_manager = UIFontsManager(ui_fonts_path, app)
 
     # Initialize Sidebar Model
-    sidebar_config_path = os.path.join(os.path.dirname(__file__), "ui_left_list.json")
+    sidebar_config_path = resource_path("ui_left_list.json")
     sidebar_model = SidebarModel(sidebar_config_path, settings_manager=settings_manager, task_registry=task_registry, parent=app)
     
     # Initialize AppImage Manager
@@ -85,7 +95,8 @@ def main():
     appimage_hub.fetch()
 
     # Load the main QML file
-    engine.load("qml/main.qml")
+    qml_file = resource_path("qml/main.qml")
+    engine.load(QUrl.fromLocalFile(qml_file) if os.path.isabs(qml_file) else qml_file)
 
     if not engine.rootObjects():
         sys.exit(-1)

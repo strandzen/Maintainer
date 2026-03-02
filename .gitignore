@@ -39,3 +39,9 @@ tasks_config.json
 .claude/
 .system_generated/
 brain/
+
+# PyInstaller / Build
+dist/
+build/
+*.spec
+build_venv/
