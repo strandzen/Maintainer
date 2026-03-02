@@ -28,6 +28,22 @@ Item {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
     }
 
+    readonly property var _segmentSizes: [appsSize, gamesSize, mediaSize, downloadsSize, vmsSize, trashCacheSize, otherSize]
+
+    function isFirstVisible(index) {
+        for (var i = 0; i < index; i++) {
+            if (_segmentSizes[i] > 0) return false;
+        }
+        return _segmentSizes[index] > 0;
+    }
+
+    function isLastVisible(index) {
+        for (var i = index + 1; i < _segmentSizes.length; i++) {
+            if (_segmentSizes[i] > 0) return false;
+        }
+        return _segmentSizes[index] > 0;
+    }
+
     ColumnLayout {
         id: layout
         width: parent.width
@@ -55,18 +71,19 @@ Item {
             Layout.preferredHeight: Kirigami.Units.gridUnit
             radius: SettingsManager.cornerRadius
             color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.1)
-            
-            // Enable layer and clipping to ensure children are rounded off at the edges
-            layer.enabled: true
-            clip: true
 
             Row {
                 anchors.fill: parent
                 // Packages
-                Rectangle {
+                Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.appsSize / root.totalDiskSize) * parent.width : 0
                     color: Kirigami.Theme.highlightColor
+                    visible: width > 0
+                    corners.topLeftRadius: isFirstVisible(0) ? barFrame.radius : 0
+                    corners.bottomLeftRadius: isFirstVisible(0) ? barFrame.radius : 0
+                    corners.topRightRadius: isLastVisible(0) ? barFrame.radius : 0
+                    corners.bottomRightRadius: isLastVisible(0) ? barFrame.radius : 0
                     MouseArea { 
                         id: pkgMouse; 
                         anchors.fill: parent; 
@@ -77,10 +94,15 @@ Item {
                     }
                 }
                 // Games
-                Rectangle {
+                Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.gamesSize / root.totalDiskSize) * parent.width : 0
                     color: "#2ecc71"
+                    visible: width > 0
+                    corners.topLeftRadius: isFirstVisible(1) ? barFrame.radius : 0
+                    corners.bottomLeftRadius: isFirstVisible(1) ? barFrame.radius : 0
+                    corners.topRightRadius: isLastVisible(1) ? barFrame.radius : 0
+                    corners.bottomRightRadius: isLastVisible(1) ? barFrame.radius : 0
                     MouseArea { 
                         id: gamesMouse; 
                         anchors.fill: parent; 
@@ -91,10 +113,15 @@ Item {
                     }
                 }
                 // Media
-                Rectangle {
+                Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.mediaSize / root.totalDiskSize) * parent.width : 0
                     color: "#f1c40f"
+                    visible: width > 0
+                    corners.topLeftRadius: isFirstVisible(2) ? barFrame.radius : 0
+                    corners.bottomLeftRadius: isFirstVisible(2) ? barFrame.radius : 0
+                    corners.topRightRadius: isLastVisible(2) ? barFrame.radius : 0
+                    corners.bottomRightRadius: isLastVisible(2) ? barFrame.radius : 0
                     MouseArea { 
                         id: mediaMouse; 
                         anchors.fill: parent; 
@@ -105,10 +132,15 @@ Item {
                     }
                 }
                 // Downloads
-                Rectangle {
+                Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.downloadsSize / root.totalDiskSize) * parent.width : 0
                     color: "#3498db"
+                    visible: width > 0
+                    corners.topLeftRadius: isFirstVisible(3) ? barFrame.radius : 0
+                    corners.bottomLeftRadius: isFirstVisible(3) ? barFrame.radius : 0
+                    corners.topRightRadius: isLastVisible(3) ? barFrame.radius : 0
+                    corners.bottomRightRadius: isLastVisible(3) ? barFrame.radius : 0
                     MouseArea { 
                         id: dlMouse; 
                         anchors.fill: parent; 
@@ -119,10 +151,15 @@ Item {
                     }
                 }
                 // VMs
-                Rectangle {
+                Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.vmsSize / root.totalDiskSize) * parent.width : 0
                     color: "#9b59b6"
+                    visible: width > 0
+                    corners.topLeftRadius: isFirstVisible(4) ? barFrame.radius : 0
+                    corners.bottomLeftRadius: isFirstVisible(4) ? barFrame.radius : 0
+                    corners.topRightRadius: isLastVisible(4) ? barFrame.radius : 0
+                    corners.bottomRightRadius: isLastVisible(4) ? barFrame.radius : 0
                     MouseArea { 
                         id: vmsMouse; 
                         anchors.fill: parent; 
@@ -133,10 +170,15 @@ Item {
                     }
                 }
                 // Cache/Trash
-                Rectangle {
+                Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.trashCacheSize / root.totalDiskSize) * parent.width : 0
                     color: "#e67e22"
+                    visible: width > 0
+                    corners.topLeftRadius: isFirstVisible(5) ? barFrame.radius : 0
+                    corners.bottomLeftRadius: isFirstVisible(5) ? barFrame.radius : 0
+                    corners.topRightRadius: isLastVisible(5) ? barFrame.radius : 0
+                    corners.bottomRightRadius: isLastVisible(5) ? barFrame.radius : 0
                     MouseArea { 
                         id: cacheMouse; 
                         anchors.fill: parent; 
@@ -147,10 +189,15 @@ Item {
                     }
                 }
                 // System
-                Rectangle {
+                Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.otherSize / root.totalDiskSize) * parent.width : 0
                     color: Kirigami.Theme.disabledTextColor
+                    visible: width > 0
+                    corners.topLeftRadius: isFirstVisible(6) ? barFrame.radius : 0
+                    corners.bottomLeftRadius: isFirstVisible(6) ? barFrame.radius : 0
+                    corners.topRightRadius: isLastVisible(6) ? barFrame.radius : 0
+                    corners.bottomRightRadius: isLastVisible(6) ? barFrame.radius : 0
                     MouseArea { 
                         id: otherMouse; 
                         anchors.fill: parent; 
