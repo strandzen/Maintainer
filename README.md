@@ -2,7 +2,18 @@
 
 **Maintainer** is a premium, modern system maintenance utility for Linux, specifically designed to integrate seamlessly with the KDE Plasma desktop environment. Built using Python, PyQt6, and the Kirigami UI framework, it provides a powerful yet intuitive interface for keeping your system clean, updated, and healthy.
 
-![Maintainer Screenshot](icons/app_icon.svg) <!-- Placeholder for a real screenshot link if available -->
+![Maintainer Screenshot](icons/app_icon.svg)
+
+## Screenshots
+
+<details>
+<summary>Click to expand screenshots</summary>
+
+![Screenshot 1](screenshots/Screenshot_20260302_191243.png)
+![Screenshot 2](screenshots/Screenshot_20260302_191317.png)
+![Screenshot 3](screenshots/Screenshot_20260302_191332.png)
+
+</details>
 
 ## Features
 
@@ -58,6 +69,15 @@ Maintainer can be bundled into a single standalone executable using PyInstaller.
    ./build_binary.sh
    ```
 2. The bundled binary will be located at `dist/Maintainer`.
+
+## Credits & Acknowledgements
+
+- **Icons**: Designed by [Dazzle UI](https://dazzleui.com/).
+- **AppImages**: Sourced from the [AppImageHub GitHub repository](https://github.com/AppImage/appimage.github.io).
+
+## AI Disclaimer
+
+**Disclaimer**: Artificial Intelligence (AI) was utilized in the creation, coding, and design of this project.
 
 ## License
 
