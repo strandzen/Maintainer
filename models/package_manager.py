@@ -206,26 +206,30 @@ class UpdateCheckWorker(QThread):
     def run(self):
         try:
             env = {**os.environ, "NO_COLOR": "1"}
-            # We use -Sy to sync databases silently before checking for updates
-            # to avoid partial upgrade scenarios when the user eventually hits Upgrade.
-            sync_cmd = [self.aur_helper, "-Sy"]
-            subprocess.run(sync_cmd, capture_output=True, env=env, timeout=30.0)
-            
-            check_cmd = [self.aur_helper, "-Qu"]
+            # We removed the silent -Sy because it requires root and can cause background failures.
+            # The app trusts the system/user keeps the database synced, or triggers -Syu via the Upgrade button.
+            cmd = [self.aur_helper, "-Qu"]
             proc = subprocess.run(
-                check_cmd,
+                cmd,
                 capture_output=True, text=True, env=env
             )
             names = []
+            # pacman/paru -Qu return 0 if updates exist, 1 if no updates.
             if proc.returncode == 0:
                 for line in proc.stdout.splitlines():
                     parts = line.split()
                     if parts:
                         name = parts[0]
-                        # Strip repo prefix like 'aur/' or 'extra/'
+                        # Strip any repo prefix (e.g., 'aur/pkgname' or 'extra/pkgname')
                         if "/" in name:
-                            name = name.split("/", 1)[1]
+                            name = name.split("/")[-1]
                         names.append(name)
+            elif proc.returncode != 1:
+                # If code is not 0 or 1, it's likely a real error (like helper not found or db locked)
+                print(f"[UpdateCheck] {self.aur_helper} -Qu failed with code {proc.returncode}")
+                if proc.stderr:
+                    print(f"[UpdateCheck] Stderr: {proc.stderr.strip()}")
+                    
             self.result.emit(names)
         except Exception as e:
             print(f"[PackageManager] update check error: {e}")
