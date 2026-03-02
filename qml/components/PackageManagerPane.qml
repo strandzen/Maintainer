@@ -242,6 +242,7 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 10 // Minimum height so it collapses, letting bottom buttons show
             color: UIColors.theme.description_background_hex ? UIColors.theme.description_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.description_darker_multiplier)
             border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor
             border.width: 0 // Removed border as requested
