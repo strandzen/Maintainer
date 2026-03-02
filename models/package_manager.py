@@ -235,11 +235,10 @@ class SearchBrowseWorker(QThread):
             self.result.emit([])
             return
             
-        is_yay = self.aur_helper == "yay"
         is_paru = self.aur_helper == "paru"
         
         args = [self.aur_helper, "-Ss", self.query]
-        # paru/yay -Ss returns format: "repo/name version [installed] \n description"
+        # paru -Ss returns format: "repo/name version [installed] \n description"
         # pacman returns similar.
         try:
             proc = subprocess.run(args, capture_output=True, text=True)
@@ -491,15 +490,15 @@ class GetInstallDepsWorker(QThread):
             self.result.emit([], "0 B")
             return
 
-        # pacman/paru/yay -S --print-format "%n %s" <packages>
+        # pacman/paru -S --print-format "%n %s" <packages>
         # gives us the packages and their download sizes, but we want installed sizes ideally. 
         # Actually -Si gives detailed info.
         # Even simpler: pacman -S --print-format "%n" gets the list of packages to install.
         try:
             # We use pacman for dependency resolution to be fast and safe, but AUR helpers extend this.
-            # Usually paru/yay -S --print-format "%n" won't install AUR packages without prompting, 
+            # Usually paru -S --print-format "%n" won't install AUR packages without prompting, 
             # so we might have to just do a basic `pacman` check first, or just bypass deps sizing for AUR
-            # To be safe, we'll try to get it from paru/yay -Sp --print-format "%n"
+            # To be safe, we'll try to get it from paru -Sp --print-format "%n"
             args = [self.aur_helper, "-Sp", "--print-format", "%n"] + list(self.names)
             proc = subprocess.run(args, capture_output=True, text=True)
             
@@ -546,9 +545,9 @@ class InstallPackageWorker(QThread):
         try:
             names_str = " ".join(self.names)
             self.progress.emit(f"Requesting privileges to install {len(self.names)} package(s) using {self.aur_helper}…")
-            # If the aur_helper is paru or yay, running as root with pkexec is actually FORBIDDEN by makepkg.
+            # If the aur_helper is paru, running as root with pkexec is actually FORBIDDEN by makepkg.
             # So we must NOT use run_privileged directly unless it's pacman.
-            # Actually paru/yay elevate themselves when needed. Let's just run them directly!
+            # Actually paru elevates itself when needed. Let's just run it directly!
             
             if self.aur_helper == "pacman":
                 cmd = ["sh", "-c", f"pacman -S --noconfirm {names_str} 2>&1"]

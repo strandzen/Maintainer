@@ -91,7 +91,7 @@ Kirigami.ScrollablePage {
 
             ComboBox {
                 Kirigami.FormData.label: "AUR Helper"
-                model: ["pacman", "paru", "yay"]
+                model: ["pacman", "paru"]
                 currentIndex: {
                     var idx = model.indexOf(SettingsManager.aurHelper)
                     return idx >= 0 ? idx : 0
@@ -198,6 +198,139 @@ Kirigami.ScrollablePage {
                 text: SettingsManager.scriptsDir
                 placeholderText: UIStrings.ui.settings.placeholder_scripts_dir
                 onEditingFinished: SettingsManager.scriptsDir = text
+            }
+
+            // --- SECTION: Colors ---
+            Label {
+                Kirigami.FormData.isSection: true
+                text: "Colors"
+                font.bold: true
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.topMargin: Kirigami.Units.largeSpacing
+            }
+            Kirigami.Separator {
+                Kirigami.FormData.isSection: true
+                Layout.fillWidth: true
+                opacity: 0.3
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: "Emphasis Color"
+                spacing: Kirigami.Units.smallSpacing
+
+                Rectangle {
+                    width: Kirigami.Units.iconSizes.small
+                    height: Kirigami.Units.iconSizes.small
+                    radius: 3
+                    color: SettingsManager.emphasisColor
+                    border.color: Kirigami.Theme.textColor
+                    border.width: 1
+                }
+
+                TextField {
+                    placeholderText: "#ff8c00"
+                    text: SettingsManager.emphasisColor
+                    onEditingFinished: {
+                        if (/^#[0-9a-fA-F]{6}$/.test(text))
+                            SettingsManager.emphasisColor = text
+                    }
+                }
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: "CPU Color"
+                spacing: Kirigami.Units.smallSpacing
+                Rectangle {
+                    width: Kirigami.Units.iconSizes.small; height: Kirigami.Units.iconSizes.small
+                    radius: 3
+                    color: SettingsManager.cpuColor || Kirigami.Theme.highlightColor
+                    border.color: Kirigami.Theme.textColor; border.width: 1
+                }
+                TextField {
+                    placeholderText: "leave empty for system default"
+                    text: SettingsManager.cpuColor
+                    onEditingFinished: {
+                        if (text === "" || /^#[0-9a-fA-F]{6}$/.test(text))
+                            SettingsManager.cpuColor = text
+                    }
+                }
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: "Memory Color"
+                spacing: Kirigami.Units.smallSpacing
+                Rectangle {
+                    width: Kirigami.Units.iconSizes.small; height: Kirigami.Units.iconSizes.small
+                    radius: 3
+                    color: SettingsManager.memoryColor || Kirigami.Theme.positiveTextColor
+                    border.color: Kirigami.Theme.textColor; border.width: 1
+                }
+                TextField {
+                    placeholderText: "leave empty for system default"
+                    text: SettingsManager.memoryColor
+                    onEditingFinished: {
+                        if (text === "" || /^#[0-9a-fA-F]{6}$/.test(text))
+                            SettingsManager.memoryColor = text
+                    }
+                }
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: "Download Color"
+                spacing: Kirigami.Units.smallSpacing
+                Rectangle {
+                    width: Kirigami.Units.iconSizes.small; height: Kirigami.Units.iconSizes.small
+                    radius: 3
+                    color: SettingsManager.downloadColor || Kirigami.Theme.positiveTextColor
+                    border.color: Kirigami.Theme.textColor; border.width: 1
+                }
+                TextField {
+                    placeholderText: "leave empty for system default"
+                    text: SettingsManager.downloadColor
+                    onEditingFinished: {
+                        if (text === "" || /^#[0-9a-fA-F]{6}$/.test(text))
+                            SettingsManager.downloadColor = text
+                    }
+                }
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: "Upload Color"
+                spacing: Kirigami.Units.smallSpacing
+                Rectangle {
+                    width: Kirigami.Units.iconSizes.small; height: Kirigami.Units.iconSizes.small
+                    radius: 3
+                    color: SettingsManager.uploadColor || Kirigami.Theme.neutralTextColor
+                    border.color: Kirigami.Theme.textColor; border.width: 1
+                }
+                TextField {
+                    placeholderText: "leave empty for system default"
+                    text: SettingsManager.uploadColor
+                    onEditingFinished: {
+                        if (text === "" || /^#[0-9a-fA-F]{6}$/.test(text))
+                            SettingsManager.uploadColor = text
+                    }
+                }
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: "Swap Bar Color"
+                spacing: Kirigami.Units.smallSpacing
+                Rectangle {
+                    width: Kirigami.Units.iconSizes.small; height: Kirigami.Units.iconSizes.small
+                    radius: 3
+                    color: SettingsManager.swapColor || Kirigami.Theme.neutralTextColor
+                    border.color: Kirigami.Theme.textColor; border.width: 1
+                }
+                TextField {
+                    placeholderText: "leave empty for system default"
+                    text: SettingsManager.swapColor
+                    onEditingFinished: {
+                        if (text === "" || /^#[0-9a-fA-F]{6}$/.test(text))
+                            SettingsManager.swapColor = text
+                    }
+                }
             }
         }
     }
