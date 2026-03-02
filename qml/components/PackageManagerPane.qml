@@ -600,6 +600,13 @@ Rectangle {
             Layout.fillWidth: true
             spacing: Kirigami.Units.smallSpacing
 
+            Label {
+                Layout.fillWidth: true
+                text: "DEBUG -> mode: '" + PackageManager.mode + "', selected: " + paneRoot.selectedCount
+                color: "red"
+                font.bold: true
+            }
+
             // Check Updates
             Button {
                 id: checkBtn
