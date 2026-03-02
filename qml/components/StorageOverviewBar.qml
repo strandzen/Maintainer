@@ -56,16 +56,8 @@ Item {
             radius: SettingsManager.cornerRadius
             color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.1)
             
-            // Enable layer to ensure children (bars) are clipped to rounded corners
+            // Enable layer and clipping to ensure children are rounded off at the edges
             layer.enabled: true
-            layer.effect: Kirigami.ShadowedRectangle {
-                anchors.fill: parent
-                radius: barFrame.radius
-                color: barFrame.color
-            }
-            // Actually, layer.enabled: true with a core Rectangle works for clipping in most QtQuick versions, 
-            // but for perfect rounded clipping of children, an OpacityMask or layer.enabled with clip:true is needed.
-            // Let's use the simplest reliable method for Kirigami:
             clip: true
 
             Row {
