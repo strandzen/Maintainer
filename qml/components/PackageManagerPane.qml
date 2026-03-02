@@ -626,15 +626,17 @@ Rectangle {
                 onClicked: PackageManager.check_updates()
             }
 
-            // Upgrade System — only when updates are available
+            // Upgrade System — proactive sync/upgrade action
             Button {
                 id: upgradeBtn
                 Layout.fillWidth: true
-                visible: PackageManager.updateCount > 0 && paneRoot.selectedCount === 0 && PackageManager.mode === "installed"
+                visible: paneRoot.selectedCount === 0 && PackageManager.mode === "installed"
                 enabled: !PackageManager.isUpgrading && !PackageManager.isLoading
                         && !PackageManager.isRemoving
                 contentItem: Label {
-                    text: PackageManager.isUpgrading ? "Upgrading…" : "Upgrade System (" + PackageManager.updateCount + ")"
+                    text: PackageManager.isUpgrading 
+                        ? "Upgrading…" 
+                        : (PackageManager.updateCount > 0 ? "Upgrade System (" + PackageManager.updateCount + ")" : "Upgrade System")
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     color: upgradeBtn.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
