@@ -6,12 +6,14 @@
 
 ## Features
 
-- 🚀 **System Health Dashboard**: Real-time monitoring of SSD health, RAM usage, and storage distribution with dynamic sparkline graphs.
+- 🚀 **System Health Dashboard**: Accurate, real-time metrics for CPU, Memory, Network traffic, Swap usage, and detailed Storage distribution.
 - 📦 **Native Package Manager**: Comprehensive interface for Arch Linux package management, supporting popular AUR helpers like `paru` and `yay`.
-- 💎 **AppImage Hub**: A centralized manager to browse, download, and manage AppImages with integrated version tracking.
-- 🧹 **Corpse Cleaner**: Intelligent identification and removal of orphaned configuration files, cache directories, and system "dead weight".
-- 🔐 **EFI Boot Audit**: Advanced tooling to audit and manage EFI boot entries safely.
-- 🖌️ **Native Integration**: Full support for KDE Plasma's Breeze theme, including Dark/Light mode switching and system palette inheritance.
+- 💎 **AppImage Hub**: A centralized manager to browse, download, launch, and update AppImages with integrated version tracking and GitHub release checking.
+- 🧹 **Corpse Cleaner**: Intelligent identification and deep scanning for orphaned configuration files, cache directories, and system "dead weight" from uninstalled software.
+- 🗑️ **Clean System Files**: Safely remove standard package caches, clear old system logs, and purge orphaned dependencies to reclaim valuable disk space.
+- 📜 **Custom Scripts**: Execute your own custom bash scripts safely through the Maintainer UI, complete with live terminal output.
+- 🔐 **EFI Boot Audit**: Advanced low-level tooling to interactively audit and manage EFI boot entries safely.
+- 🖌️ **Native Desktop Integration**: Perfect alignment with KDE Plasma's UI guidelines, matching global corner radius, icons, colors, and transparent Kirigami components.
 
 ## Architecture
 

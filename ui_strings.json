@@ -8,7 +8,7 @@
     "landing": {
         "title": "Home",
         "app_name": "Arch System Maintainer",
-        "app_description": "A comprehensive system maintenance tool tailored for Linux and Arch-based distributions. Keep your system clean, fast, and optimized.",
+        "app_description": "A comprehensive system maintenance tool tailored for Arch Linux. Easily clean away unused package caches, lingering config corpses, and old logs to reclaim space. Monitor system resources, discover and manage AppImages, and run custom maintenance scripts all in one seamless application.",
         "ssd_health": "SSD health",
         "ram_available": "RAM available",
         "storage_available": "Storage available",

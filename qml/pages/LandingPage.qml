@@ -45,22 +45,6 @@ Kirigami.ScrollablePage {
             Layout.bottomMargin: Kirigami.Units.largeSpacing
         }
         
-        // Storage Overview
-        StorageOverviewBar {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: page.customContentWidth
-            Layout.bottomMargin: Kirigami.Units.largeSpacing
-            
-            appsSize: SystemHealth.appsSize
-            mediaSize: SystemHealth.mediaSize
-            gamesSize: SystemHealth.gamesSize
-            downloadsSize: SystemHealth.downloadsSize
-            vmsSize: SystemHealth.vmsSize
-            trashCacheSize: SystemHealth.trashCacheSize
-            otherSize: SystemHealth.otherSize
-            totalUsedSize: SystemHealth.totalUsedSize
-            totalDiskSize: SystemHealth.totalDiskSize
-        }
 
         // Description
         Rectangle {

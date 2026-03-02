@@ -423,12 +423,29 @@ Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
             visible: isReady && isHomeActive && selectedCount === 0
-            icon.name: "media-playback-start"
             onClicked: {
                 var recommendedModel = TaskRegistry.recommendedTasksModel
                 if (recommendedModel) {
                     var tasks = recommendedModel.get_checked_tasks()
                     TaskEngine.start_tasks(tasks)
+                }
+            }
+            contentItem: Item {
+                anchors.fill: parent
+                Row {
+                    anchors.centerIn: parent
+                    spacing: Kirigami.Units.smallSpacing
+                    Kirigami.Icon {
+                        source: "media-playback-start"
+                        width: Kirigami.Units.iconSizes.smallMedium
+                        height: Kirigami.Units.iconSizes.smallMedium
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Label {
+                        text: UIStrings.ui.landing.run_recommended
+                        color: Kirigami.Theme.textColor
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
                 }
             }
             background: Rectangle {
@@ -471,23 +488,25 @@ Rectangle {
                     TaskEngine.start_tasks(tasks)
                 }
             }
-            contentItem: RowLayout {
-                spacing: Kirigami.Units.smallSpacing
-                Layout.alignment: Qt.AlignHCenter
-                Kirigami.Icon {
-                    source: UIIcons.icons.run || ""
-                    Layout.preferredWidth: Kirigami.Units.iconSizes.small
-                    Layout.preferredHeight: Kirigami.Units.iconSizes.small
-                    isMask: UIIcons.shouldColorize("run")
-                    color: UIIcons.iconColor("run", Kirigami.Theme.highlightColor)
-                }
-                Label {
-                    text: "Run (" + selectedCount + ")"
-                    visible: !root.isCompact
-                    color: Kirigami.Theme.textColor
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.fillWidth: true
+            contentItem: Item {
+                anchors.fill: parent
+                Row {
+                    anchors.centerIn: parent
+                    spacing: Kirigami.Units.smallSpacing
+                    Kirigami.Icon {
+                        source: UIIcons.icons.run || ""
+                        width: Kirigami.Units.iconSizes.smallMedium
+                        height: Kirigami.Units.iconSizes.smallMedium
+                        anchors.verticalCenter: parent.verticalCenter
+                        isMask: UIIcons.shouldColorize("run")
+                        color: UIIcons.iconColor("run", Kirigami.Theme.highlightColor)
+                    }
+                    Label {
+                        text: "Run (" + selectedCount + ")"
+                        visible: !root.isCompact
+                        color: Kirigami.Theme.textColor
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
                 }
             }
             background: Rectangle {
