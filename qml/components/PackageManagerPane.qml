@@ -600,21 +600,19 @@ Rectangle {
             Layout.fillWidth: true
             spacing: Kirigami.Units.smallSpacing
 
-            Label {
-                Layout.fillWidth: true
-                text: "DEBUG -> mode: '" + PackageManager.mode + "', selected: " + paneRoot.selectedCount
-                color: "red"
-                font.bold: true
-            }
-
             // Check Updates
             Button {
                 id: checkBtn
                 Layout.fillWidth: true
                 visible: paneRoot.selectedCount === 0 && PackageManager.mode === "installed"
-                text: PackageManager.isCheckingUpdates ? "Checking…" : "Check Updates"
                 enabled: !PackageManager.isCheckingUpdates && !PackageManager.isLoading
                         && !PackageManager.isUpgrading && !PackageManager.isRemoving
+                contentItem: Label {
+                    text: PackageManager.isCheckingUpdates ? "Checking…" : "Check Updates"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    color: checkBtn.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
+                }
                 background: Rectangle {
                     color: checkBtn.down
                         ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.2)
@@ -633,11 +631,14 @@ Rectangle {
                 id: upgradeBtn
                 Layout.fillWidth: true
                 visible: PackageManager.updateCount > 0 && paneRoot.selectedCount === 0 && PackageManager.mode === "installed"
-                text: PackageManager.isUpgrading
-                    ? "Upgrading…"
-                    : "Upgrade System (" + PackageManager.updateCount + ")"
                 enabled: !PackageManager.isUpgrading && !PackageManager.isLoading
                         && !PackageManager.isRemoving
+                contentItem: Label {
+                    text: PackageManager.isUpgrading ? "Upgrading…" : "Upgrade System (" + PackageManager.updateCount + ")"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    color: upgradeBtn.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
+                }
                 background: Rectangle {
                     color: upgradeBtn.down
                         ? Qt.rgba(Kirigami.Theme.positiveTextColor.r, Kirigami.Theme.positiveTextColor.g, Kirigami.Theme.positiveTextColor.b, 0.2)
