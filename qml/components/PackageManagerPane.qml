@@ -604,7 +604,7 @@ Rectangle {
             Button {
                 id: checkBtn
                 Layout.fillWidth: true
-                visible: PackageManager.mode === "installed"
+                visible: paneRoot.selectedCount === 0 && PackageManager.mode === "installed"
                 text: PackageManager.isCheckingUpdates ? "Checking…" : "Check Updates"
                 enabled: !PackageManager.isCheckingUpdates && !PackageManager.isLoading
                         && !PackageManager.isUpgrading && !PackageManager.isRemoving
@@ -625,7 +625,7 @@ Rectangle {
             Button {
                 id: upgradeBtn
                 Layout.fillWidth: true
-                visible: PackageManager.updateCount > 0 && PackageManager.mode === "installed"
+                visible: PackageManager.updateCount > 0 && paneRoot.selectedCount === 0 && PackageManager.mode === "installed"
                 text: PackageManager.isUpgrading
                     ? "Upgrading…"
                     : "Upgrade System (" + PackageManager.updateCount + ")"
