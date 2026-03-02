@@ -3,7 +3,9 @@
 
 **Disclaimer**: Artificial Intelligence (AI) was utilized in the creation, coding, and design of this project.
 
-**Maintainer** is a system maintenance utility for Linux, specifically designed to integrate with the KDE Plasma desktop environment. "Built" using Python, PyQt6, and the Kirigami UI framework, it provides a powerful yet intuitive interface for keeping your system clean, updated, and in good condition.
+**Maintainer** is a system maintenance utility for Linux, specifically designed to integrate with the KDE Plasma desktop environment, tested on CachyOS with Plasma 6.6. "Built" using Python, PyQt6, and the Kirigami UI framework, it provides a powerful interface for keeping your system clean, updated, and in good condition. 
+
+The goal was to create a one stop shop/hub for all "scary" Linux terminal commands and etc. I wanted to create an app a theoretical elderly could understand. 
 ## Screenshots
 
 <details>
@@ -18,12 +20,11 @@
 ## Features
 
 - 🚀 **System Health Dashboard**: Accurate, real-time metrics for CPU, Memory, Network traffic, Swap usage, and detailed Storage distribution.
-- 📦 **Native Package Manager**: Comprehensive interface for Arch Linux package management, supporting popular AUR helpers like `paru` and `yay`.
+- 📦 **Native Package Manager**: Comprehensive interface for Arch Linux package management, supporting the AUR with `paru`
 - 🎁 **AppImage Hub**: A centralized manager to browse, download, launch, and update AppImages with integrated version tracking and GitHub release checking.
 - 🧹 **Corpse Cleaner**: Intelligent identification and deep scanning for orphaned configuration files, cache directories, and system "dead weight" from uninstalled software.
 - 🗑️ **Clean System Files**: Safely remove standard package caches, clear old system logs, and purge orphaned dependencies to reclaim valuable disk space.
 - 📜 **Custom Scripts**: Execute your own custom bash scripts safely through a GUI, complete with live terminal output.
-- 🔐 **EFI Boot Audit**: Advanced low-level tooling to audit and manage EFI boot entries.
 - 🖌️ **Native Desktop Integration**: Perfect alignment with KDE Plasma's UI guidelines, matching global corner radius, colors, UI elements. Tested with [KDE Material You Colors](https://github.com/luisbocanegra/kde-material-you-colors) . 
 
 ## Architecture
