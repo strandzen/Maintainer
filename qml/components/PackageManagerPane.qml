@@ -634,9 +634,9 @@ Rectangle {
                 enabled: !PackageManager.isUpgrading && !PackageManager.isLoading
                         && !PackageManager.isRemoving
                 contentItem: Label {
-                    text: PackageManager.isUpgrading 
-                        ? "Upgrading…" 
-                        : (PackageManager.updateCount > 0 ? "Upgrade System (" + PackageManager.updateCount + ")" : "Upgrade System")
+                    text: PackageManager.isUpgrading
+                        ? "Upgrading…"
+                        : (PackageManager.updateCount > 0 ? "Upgrade System (" + PackageManager.updateCount + ")" : "Full System Upgrade")
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     color: upgradeBtn.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor

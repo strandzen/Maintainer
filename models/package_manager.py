@@ -206,8 +206,14 @@ class UpdateCheckWorker(QThread):
     def run(self):
         try:
             env = {**os.environ, "NO_COLOR": "1"}
+            # We use -Sy to sync databases silently before checking for updates
+            # to avoid partial upgrade scenarios when the user eventually hits Upgrade.
+            sync_cmd = [self.aur_helper, "-Sy"]
+            subprocess.run(sync_cmd, capture_output=True, env=env, timeout=30.0)
+            
+            check_cmd = [self.aur_helper, "-Qu"]
             proc = subprocess.run(
-                [self.aur_helper, "-Qu"],
+                check_cmd,
                 capture_output=True, text=True, env=env
             )
             names = []
@@ -216,6 +222,7 @@ class UpdateCheckWorker(QThread):
                     parts = line.split()
                     if parts:
                         name = parts[0]
+                        # Strip repo prefix like 'aur/' or 'extra/'
                         if "/" in name:
                             name = name.split("/", 1)[1]
                         names.append(name)
@@ -951,11 +958,13 @@ class PackageManager(QObject):
     def check_updates(self):
         self._set_checking(True)
         aur_helper = self._settings_manager.aurHelper if self._settings_manager else "pacman"
+        print(f"[PackageManager] Checking for updates using helper: {aur_helper}")
         self.update_worker = UpdateCheckWorker(aur_helper=aur_helper, parent=self)
         self.update_worker.result.connect(self._on_updates_checked)
         self.update_worker.start()
 
     def _on_updates_checked(self, names):
+        print(f"[PackageManager] Updates checked: {len(names)} packages found.")
         self._updatable = set(names)
         self._update_update_count()
         self._rebuild_model()
@@ -989,12 +998,18 @@ class PackageManager(QObject):
     @pyqtSlot()
     def upgrade(self):
         self._set_upgrading(True)
-        self._clear_removal_output()
-        aur_helper = self._settings_manager.aurHelper if self._settings_manager else "pacman"
-        self.upgrade_worker = UpgradeWorker(aur_helper=aur_helper, parent=self)
-        self.upgrade_worker.progress.connect(self._append_removal_output)
-        self.upgrade_worker.finished.connect(self._on_upgrade_finished)
-        self.upgrade_worker.start()
+        # We always use -Syu for the actual upgrade to ensure full system sync and safety.
+        cmd = "paru -Syu"
+        if self._settings_manager and self._settings_manager.aurHelper == "pacman":
+            cmd = "sudo pacman -Syu"
+        
+        # This emit triggers the terminal popup via main.py or similar
+        self.upgradeActionTriggered.emit(cmd)
+        # We don't set upgrading to false here, we wait for the user to potentially refresh 
+        # or the app to detect success. For now, we'll reset it after a delay or just let it be.
+        # Actually, the user usually closes the terminal, we don't have a reliable callback.
+        # So we'll reset it so they can click again if needed.
+        self._set_upgrading(False)
 
     def _on_upgrade_finished(self, success):
         self._set_upgrading(False)
