@@ -160,25 +160,8 @@ Kirigami.Page {
                             }
                             spacing: Kirigami.Units.smallSpacing
 
-                            // Disk section
-                            RowLayout {
-                                Layout.fillWidth: true
-                                Label {
-                                    text: UIStrings.ui.monitor.disks
-                                    font.weight: Font.DemiBold
-                                    color: UIColors.theme.neutral_text_hex || Kirigami.Theme.neutralTextColor
-                                }
-                                Item { Layout.fillWidth: true }
-                                Label {
-                                    text: SystemHealth.storageTotalStr
-                                    color: Kirigami.Theme.highlightColor
-                                    font.weight: Font.DemiBold
-                                }
-                            }
-
                             MyComponents.StorageOverviewBar {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: Kirigami.Units.gridUnit
                                 
                                 appsSize: SystemHealth.appsSize
                                 mediaSize: SystemHealth.mediaSize

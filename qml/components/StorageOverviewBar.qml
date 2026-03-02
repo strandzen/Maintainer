@@ -71,6 +71,8 @@ Item {
             Layout.preferredHeight: Kirigami.Units.gridUnit
             radius: SettingsManager.cornerRadius
             color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.1)
+            border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+            border.width: 1
 
             Row {
                 anchors.fill: parent
