@@ -215,7 +215,10 @@ class UpdateCheckWorker(QThread):
                 for line in proc.stdout.splitlines():
                     parts = line.split()
                     if parts:
-                        names.append(parts[0])
+                        name = parts[0]
+                        if "/" in name:
+                            name = name.split("/", 1)[1]
+                        names.append(name)
             self.result.emit(names)
         except Exception as e:
             print(f"[PackageManager] update check error: {e}")
