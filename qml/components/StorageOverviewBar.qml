@@ -64,63 +64,98 @@ Item {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.appsSize / root.totalDiskSize) * parent.width : 0
                     color: Kirigami.Theme.highlightColor
-                    ToolTip.visible: pkgMouse.containsMouse
-                    ToolTip.text: "Packages: " + formatBytes(root.appsSize)
-                    MouseArea { id: pkgMouse; anchors.fill: parent; hoverEnabled: true }
+                    MouseArea { 
+                        id: pkgMouse; 
+                        anchors.fill: parent; 
+                        hoverEnabled: true
+                        ToolTip.visible: containsMouse
+                        ToolTip.text: "Packages: " + formatBytes(root.appsSize)
+                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                    }
                 }
                 // Games
                 Rectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.gamesSize / root.totalDiskSize) * parent.width : 0
                     color: "#2ecc71"
-                    ToolTip.visible: gamesMouse.containsMouse
-                    ToolTip.text: "Games: " + formatBytes(root.gamesSize)
-                    MouseArea { id: gamesMouse; anchors.fill: parent; hoverEnabled: true }
+                    MouseArea { 
+                        id: gamesMouse; 
+                        anchors.fill: parent; 
+                        hoverEnabled: true
+                        ToolTip.visible: containsMouse
+                        ToolTip.text: "Games: " + formatBytes(root.gamesSize)
+                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                    }
                 }
                 // Media
                 Rectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.mediaSize / root.totalDiskSize) * parent.width : 0
                     color: "#f1c40f"
-                    ToolTip.visible: mediaMouse.containsMouse
-                    ToolTip.text: "Media: " + formatBytes(root.mediaSize)
-                    MouseArea { id: mediaMouse; anchors.fill: parent; hoverEnabled: true }
+                    MouseArea { 
+                        id: mediaMouse; 
+                        anchors.fill: parent; 
+                        hoverEnabled: true
+                        ToolTip.visible: containsMouse
+                        ToolTip.text: "Media: " + formatBytes(root.mediaSize)
+                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                    }
                 }
                 // Downloads
                 Rectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.downloadsSize / root.totalDiskSize) * parent.width : 0
                     color: "#3498db"
-                    ToolTip.visible: dlMouse.containsMouse
-                    ToolTip.text: "Downloads: " + formatBytes(root.downloadsSize)
-                    MouseArea { id: dlMouse; anchors.fill: parent; hoverEnabled: true }
+                    MouseArea { 
+                        id: dlMouse; 
+                        anchors.fill: parent; 
+                        hoverEnabled: true
+                        ToolTip.visible: containsMouse
+                        ToolTip.text: "Downloads: " + formatBytes(root.downloadsSize)
+                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                    }
                 }
                 // VMs
                 Rectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.vmsSize / root.totalDiskSize) * parent.width : 0
                     color: "#9b59b6"
-                    ToolTip.visible: vmsMouse.containsMouse
-                    ToolTip.text: "VMs: " + formatBytes(root.vmsSize)
-                    MouseArea { id: vmsMouse; anchors.fill: parent; hoverEnabled: true }
+                    MouseArea { 
+                        id: vmsMouse; 
+                        anchors.fill: parent; 
+                        hoverEnabled: true
+                        ToolTip.visible: containsMouse
+                        ToolTip.text: "VMs: " + formatBytes(root.vmsSize)
+                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                    }
                 }
                 // Cache/Trash
                 Rectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.trashCacheSize / root.totalDiskSize) * parent.width : 0
                     color: "#e67e22"
-                    ToolTip.visible: cacheMouse.containsMouse
-                    ToolTip.text: "Cache & Trash: " + formatBytes(root.trashCacheSize)
-                    MouseArea { id: cacheMouse; anchors.fill: parent; hoverEnabled: true }
+                    MouseArea { 
+                        id: cacheMouse; 
+                        anchors.fill: parent; 
+                        hoverEnabled: true
+                        ToolTip.visible: containsMouse
+                        ToolTip.text: "Cache & Trash: " + formatBytes(root.trashCacheSize)
+                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                    }
                 }
                 // System
                 Rectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.otherSize / root.totalDiskSize) * parent.width : 0
                     color: Kirigami.Theme.disabledTextColor
-                    ToolTip.visible: otherMouse.containsMouse
-                    ToolTip.text: "System: " + formatBytes(root.otherSize)
-                    MouseArea { id: otherMouse; anchors.fill: parent; hoverEnabled: true }
+                    MouseArea { 
+                        id: otherMouse; 
+                        anchors.fill: parent; 
+                        hoverEnabled: true
+                        ToolTip.visible: containsMouse
+                        ToolTip.text: "System: " + formatBytes(root.otherSize)
+                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                    }
                 }
             }
         }

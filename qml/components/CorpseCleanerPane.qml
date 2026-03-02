@@ -168,6 +168,8 @@ Rectangle {
                             rightPadding: corpseClearBtn.width + Kirigami.Units.smallSpacing
                             ToolButton {
                                 id: corpseClearBtn
+                                implicitWidth: Kirigami.Units.gridUnit * 1.5
+                                implicitHeight: Kirigami.Units.gridUnit * 1.5
                                 icon.name: "edit-clear"
                                 visible: corpseSearchField.text.length > 0
                                 anchors.right: parent.right

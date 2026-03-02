@@ -439,6 +439,8 @@ Kirigami.Page {
                                         spacing: Kirigami.Units.smallSpacing
 
                                         ToolButton {
+                                            implicitWidth: Kirigami.Units.gridUnit * 2
+                                            implicitHeight: Kirigami.Units.gridUnit * 2
                                             visible: model.exe !== ""
                                             onClicked: SystemHealth.open_file_location(model.pid)
                                             ToolTip.text: "Open Folder Location"
@@ -457,6 +459,8 @@ Kirigami.Page {
                                         }
 
                                         ToolButton {
+                                            implicitWidth: Kirigami.Units.gridUnit * 2
+                                            implicitHeight: Kirigami.Units.gridUnit * 2
                                             onClicked: SystemHealth.kill_process(model.pid)
                                             ToolTip.text: "Kill Process"
                                             ToolTip.visible: hovered

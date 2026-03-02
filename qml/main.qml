@@ -281,7 +281,8 @@ ApplicationWindow {
         ColumnLayout {
             id: confirmLayout
             spacing: Kirigami.Units.largeSpacing
-            width: parent.width - Kirigami.Units.gridUnit * 2
+            Layout.fillWidth: true
+            Layout.margins: Kirigami.Units.gridUnit
             
             Label {
                 text: "The following specific folders will be completely deleted. This action cannot be undone. Are you sure you want to proceed?"
@@ -427,7 +428,8 @@ ApplicationWindow {
         ColumnLayout {
             id: auditLayout
             spacing: Kirigami.Units.largeSpacing
-            width: parent.width - Kirigami.Units.gridUnit * 2
+            Layout.fillWidth: true
+            Layout.margins: Kirigami.Units.gridUnit
             
             Label {
                 text: UIStrings.ui.boot_audit.confirm_description
