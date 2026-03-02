@@ -11,6 +11,11 @@ Kirigami.Page {
     title: UIStrings.ui.monitor.title
 
     titleDelegate: Item {}
+    padding: 0
+    topPadding: 0
+    bottomPadding: 0
+    leftPadding: 0
+    rightPadding: 0
 
     function formatSpeed(b) {
         if (b >= 1024 * 1024) return (b / (1024 * 1024)).toFixed(1) + " MiB/s"
@@ -50,14 +55,21 @@ Kirigami.Page {
         TabBar {
             id: tabBar
             Layout.fillWidth: true
+            Layout.bottomMargin: Kirigami.Units.smallSpacing
 
             background: Rectangle {
                 color: Qt.darker(Kirigami.Theme.backgroundColor, 1.2)
                 radius: Kirigami.Units.smallSpacing
             }
 
-            MyComponents.StyledTabButton { text: UIStrings.ui.monitor.overview }
-            MyComponents.StyledTabButton { text: UIStrings.ui.monitor.processes }
+            MyComponents.StyledTabButton { 
+                text: UIStrings.ui.monitor.overview
+                Layout.fillWidth: true
+            }
+            MyComponents.StyledTabButton { 
+                text: UIStrings.ui.monitor.processes
+                Layout.fillWidth: true
+            }
         }
 
         // ── Content ────────────────────────────────────────────────────────
@@ -71,7 +83,6 @@ Kirigami.Page {
             Item {
                 ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: Kirigami.Units.largeSpacing
                     spacing: Kirigami.Units.largeSpacing
 
                     // 2×2 metric panel grid
@@ -165,24 +176,19 @@ Kirigami.Page {
                                 }
                             }
 
-                            ProgressBar {
+                            MyComponents.StorageOverviewBar {
                                 Layout.fillWidth: true
-                                value: SystemHealth.storageUsage
-
-                                background: Rectangle {
-                                    implicitHeight: Kirigami.Units.mediumSpacing
-                                    color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.1)
-                                    radius: Kirigami.Units.smallSpacing
-                                }
-                                contentItem: Item {
-                                    implicitHeight: Kirigami.Units.mediumSpacing
-                                    Rectangle {
-                                        width: parent.parent.visualPosition * parent.width
-                                        height: parent.height
-                                        radius: Kirigami.Units.smallSpacing
-                                        color: Kirigami.Theme.highlightColor
-                                    }
-                                }
+                                Layout.preferredHeight: Kirigami.Units.gridUnit
+                                
+                                appsSize: SystemHealth.appsSize
+                                mediaSize: SystemHealth.mediaSize
+                                gamesSize: SystemHealth.gamesSize
+                                downloadsSize: SystemHealth.downloadsSize
+                                vmsSize: SystemHealth.vmsSize
+                                trashCacheSize: SystemHealth.trashCacheSize
+                                otherSize: SystemHealth.otherSize
+                                totalUsedSize: SystemHealth.totalUsedSize
+                                totalDiskSize: SystemHealth.totalDiskSize
                             }
 
                             // Swap section
