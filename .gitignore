@@ -34,7 +34,6 @@ ENV/
 # Project specific
 appimage_custom.json
 package_favorites.json
-tasks_config.json
 *.tmp
 .claude/
 .system_generated/
