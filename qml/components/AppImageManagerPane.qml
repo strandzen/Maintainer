@@ -13,6 +13,8 @@ Rectangle {
     radius: SettingsManager.cornerRadius
     clip: true
 
+    readonly property color effectiveHighlight: Kirigami.Theme.highlightColor
+
     property real idealWidth: Kirigami.Units.gridUnit * 22
     property string selectedAppImagePath: ""
     property string currentUpdateUrl: ""
@@ -41,7 +43,7 @@ Rectangle {
                     font.weight: parent.checked ? Font.Bold : Font.Normal
                 }
                 background: Rectangle {
-                    color: parent.checked ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.2) : "transparent"
+                    color: parent.checked ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.2) : "transparent"
                     radius: Kirigami.Units.smallSpacing
                 }
             }
@@ -56,7 +58,7 @@ Rectangle {
                     font.weight: parent.checked ? Font.Bold : Font.Normal
                 }
                 background: Rectangle {
-                    color: parent.checked ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.2) : "transparent"
+                    color: parent.checked ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.2) : "transparent"
                     radius: Kirigami.Units.smallSpacing
                 }
             }
@@ -150,9 +152,9 @@ Rectangle {
 
                         background: Rectangle {
                             color: model.isChecked 
-                                ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.2)
+                                ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.2)
                                 : instDel.hovered 
-                                ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.08)
+                                ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.08)
                                 : "transparent"
                         }
 
@@ -222,28 +224,26 @@ Rectangle {
                                     Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
 
                                     ToolButton {
-                                        Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-                                        Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+                                        Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
+                                        Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
                                         onClicked: {
                                             paneRoot.selectedAppImagePath = model.path;
                                             paneRoot.currentUpdateUrl = model.updateUrl || "";
                                             urlDialog.urlFieldText = paneRoot.currentUpdateUrl;
                                             urlDialog.open();
                                         }
-                                        contentItem: Item {
-                                            Kirigami.Icon {
-                                                anchors.centerIn: parent
-                                                width: Kirigami.Units.iconSizes.smallMedium
-                                                height: Kirigami.Units.iconSizes.smallMedium
-                                                source: UIIcons.icons.url || ""
-                                                isMask: true
-                                                color: (model.updateUrl && model.updateUrl !== "") ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
-                                            }
+                                        ToolTip.text: (model.updateUrl && model.updateUrl !== "") ? "Edit Update URL" : "Set Update URL"
+                                        ToolTip.visible: hovered
+                                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                                        contentItem: Kirigami.Icon {
+                                            source: (model.updateUrl && model.updateUrl !== "") ? (UIIcons.icons.url || "") : (UIIcons.icons.empty_url || "")
+                                            isMask: true
+                                            color: (model.updateUrl && model.updateUrl !== "") ? paneRoot.effectiveHighlight : Kirigami.Theme.disabledTextColor
                                         }
                                     }
 
                                     ToolButton {
-                                        visible: false // Hidden by user request
+                                        visible: true
                                         onClicked: AppImageManager.check_for_updates(model.path)
                                         ToolTip.text: "Check for Updates"
                                         ToolTip.visible: hovered
@@ -328,9 +328,9 @@ Rectangle {
                         text: AppImageManager.isChecking ? "Checking all…" : "Check All Updates"
                         enabled: !AppImageManager.isChecking && !AppImageManager.isDownloading
                         background: Rectangle {
-                            color: parent.down ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.2)
-                                               : parent.hovered ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.1) : "transparent"
-                            border.color: Kirigami.Theme.highlightColor; border.width: 1; radius: Kirigami.Units.smallSpacing
+                            color: parent.down ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.2)
+                                               : parent.hovered ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.1) : "transparent"
+                            border.color: paneRoot.effectiveHighlight; border.width: 1; radius: Kirigami.Units.smallSpacing
                         }
                         onClicked: AppImageManager.check_all_updates()
                     }
@@ -442,7 +442,7 @@ Rectangle {
 
                         background: Rectangle {
                             color: delegateRoot.hovered 
-                                ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.08)
+                                ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.08)
                                 : "transparent"
                         }
 

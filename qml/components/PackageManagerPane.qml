@@ -603,7 +603,7 @@ Rectangle {
             Button {
                 id: checkBtn
                 Layout.fillWidth: true
-                visible: paneRoot.selectedCount === 0 && PackageManager.mode === "installed"
+                visible: PackageManager.mode === "installed"
                 text: PackageManager.isCheckingUpdates ? "Checking…" : "Check Updates"
                 enabled: !PackageManager.isCheckingUpdates && !PackageManager.isLoading
                         && !PackageManager.isUpgrading && !PackageManager.isRemoving
@@ -620,11 +620,11 @@ Rectangle {
                 onClicked: PackageManager.check_updates()
             }
 
-            // Upgrade System — only when updates are available AND no packages selected for action
+            // Upgrade System — only when updates are available
             Button {
                 id: upgradeBtn
                 Layout.fillWidth: true
-                visible: PackageManager.updateCount > 0 && paneRoot.selectedCount === 0 && PackageManager.mode === "installed"
+                visible: PackageManager.updateCount > 0 && PackageManager.mode === "installed"
                 text: PackageManager.isUpgrading
                     ? "Upgrading…"
                     : "Upgrade System (" + PackageManager.updateCount + ")"
