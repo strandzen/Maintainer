@@ -8,7 +8,7 @@ import "../Utils.js" as Utils
 Rectangle {
     id: paneRoot
     color: UIColors.theme.queue_background_hex ? UIColors.theme.queue_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.queue_darker_multiplier)
-    border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor
+    border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
     border.width: 1
     radius: SettingsManager.cornerRadius
     clip: true
@@ -325,8 +325,29 @@ Rectangle {
                     Button {
                         Layout.fillWidth: true
                         visible: AppImageManager.checkedCount === 0
-                        text: AppImageManager.isChecking ? "Checking all…" : "Check All Updates"
                         enabled: !AppImageManager.isChecking && !AppImageManager.isDownloading
+                        contentItem: Item {
+                            implicitWidth: row1.implicitWidth
+                            implicitHeight: row1.implicitHeight
+                            Row {
+                                id: row1
+                                anchors.centerIn: parent
+                                spacing: Kirigami.Units.smallSpacing
+                                Kirigami.Icon {
+                                    source: UIIcons.icons.check_update || ""
+                                    width: Kirigami.Units.iconSizes.smallMedium
+                                    height: Kirigami.Units.iconSizes.smallMedium
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    isMask: UIIcons.shouldColorize("check_update")
+                                    color: UIIcons.iconColor("check_update", parent.enabled ? paneRoot.effectiveHighlight : Kirigami.Theme.disabledTextColor)
+                                }
+                                Label {
+                                    text: AppImageManager.isChecking ? "Checking all…" : "Check All Updates"
+                                    color: parent.enabled ? paneRoot.effectiveHighlight : Kirigami.Theme.disabledTextColor
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                        }
                         background: Rectangle {
                             color: parent.down ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.2)
                                                : parent.hovered ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.1) : "transparent"
@@ -338,8 +359,29 @@ Rectangle {
                     Button {
                         Layout.fillWidth: true
                         visible: AppImageManager.checkedUpdateCount > 0
-                        text: AppImageManager.isDownloading ? "Downloading…" : "Download Updates (" + AppImageManager.checkedUpdateCount + ")"
                         enabled: !AppImageManager.isDownloading && !AppImageManager.isChecking
+                        contentItem: Item {
+                            implicitWidth: row2.implicitWidth
+                            implicitHeight: row2.implicitHeight
+                            Row {
+                                id: row2
+                                anchors.centerIn: parent
+                                spacing: Kirigami.Units.smallSpacing
+                                Kirigami.Icon {
+                                    source: UIIcons.icons.download || ""
+                                    width: Kirigami.Units.iconSizes.smallMedium
+                                    height: Kirigami.Units.iconSizes.smallMedium
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    isMask: UIIcons.shouldColorize("download")
+                                    color: UIIcons.iconColor("download", parent.enabled ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.disabledTextColor)
+                                }
+                                Label {
+                                    text: AppImageManager.isDownloading ? "Downloading…" : "Download Updates (" + AppImageManager.checkedUpdateCount + ")"
+                                    color: parent.enabled ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.disabledTextColor
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                        }
                         background: Rectangle {
                             color: parent.down ? Qt.rgba(Kirigami.Theme.positiveTextColor.r, Kirigami.Theme.positiveTextColor.g, Kirigami.Theme.positiveTextColor.b, 0.2)
                                                : parent.hovered ? Qt.rgba(Kirigami.Theme.positiveTextColor.r, Kirigami.Theme.positiveTextColor.g, Kirigami.Theme.positiveTextColor.b, 0.1) : "transparent"
@@ -351,8 +393,29 @@ Rectangle {
                     Button {
                         Layout.fillWidth: true
                         visible: AppImageManager.checkedCount > 0 && AppImageManager.checkedUpdateCount === 0
-                        text: "Remove Selected (" + AppImageManager.checkedCount + ")"
                         enabled: !AppImageManager.isDownloading && !AppImageManager.isChecking
+                        contentItem: Item {
+                            implicitWidth: row3.implicitWidth
+                            implicitHeight: row3.implicitHeight
+                            Row {
+                                id: row3
+                                anchors.centerIn: parent
+                                spacing: Kirigami.Units.smallSpacing
+                                Kirigami.Icon {
+                                    source: UIIcons.icons.delete || ""
+                                    width: Kirigami.Units.iconSizes.smallMedium
+                                    height: Kirigami.Units.iconSizes.smallMedium
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    isMask: true
+                                    color: UIIcons.iconColor("delete", parent.enabled ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.disabledTextColor)
+                                }
+                                Label {
+                                    text: "Remove Selected (" + AppImageManager.checkedCount + ")"
+                                    color: parent.enabled ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.disabledTextColor
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                        }
                         background: Rectangle {
                             color: parent.down ? Qt.rgba(Kirigami.Theme.negativeTextColor.r, Kirigami.Theme.negativeTextColor.g, Kirigami.Theme.negativeTextColor.b, 0.2)
                                                : parent.hovered ? Qt.rgba(Kirigami.Theme.negativeTextColor.r, Kirigami.Theme.negativeTextColor.g, Kirigami.Theme.negativeTextColor.b, 0.1) : "transparent"
@@ -513,9 +576,28 @@ Rectangle {
                             Button {
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.minimumWidth: Kirigami.Units.gridUnit * 5.5
-                                text: delegateRoot.isInstalled ? "Installed" : (delegateRoot.isThisChecking || delegateRoot.isThisInstalling) ? "Installing…" : "Install"
-                                enabled: !delegateRoot.isInstalled && !delegateRoot.isThisChecking && !delegateRoot.isThisInstalling && AppImageManager.hubInstallStatus !== "downloading" && AppImageManager.hubInstallStatus !== "checking"
-                                highlighted: !delegateRoot.isInstalled && AppImageManager.hubInstallStatus === "idle"
+                                contentItem: Item {
+                                    implicitWidth: row4.implicitWidth
+                                    implicitHeight: row4.implicitHeight
+                                    Row {
+                                        id: row4
+                                        anchors.centerIn: parent
+                                        spacing: Kirigami.Units.smallSpacing
+                                        Kirigami.Icon {
+                                            source: delegateRoot.isInstalled ? (UIIcons.icons.success || "") : (UIIcons.icons.download || "")
+                                            width: Kirigami.Units.iconSizes.smallMedium
+                                            height: Kirigami.Units.iconSizes.smallMedium
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            isMask: delegateRoot.isInstalled ? UIIcons.shouldColorize("success") : UIIcons.shouldColorize("download")
+                                            color: UIIcons.iconColor(delegateRoot.isInstalled ? "success" : "download", parent.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor)
+                                        }
+                                        Label {
+                                            text: delegateRoot.isInstalled ? "Installed" : (delegateRoot.isThisChecking || delegateRoot.isThisInstalling) ? "Installing…" : "Install"
+                                            color: parent.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                    }
+                                }
                                 onClicked: AppImageManager.install_from_hub(delegateRoot.appOwnerRepo, delegateRoot.appName)
                             }
                         }

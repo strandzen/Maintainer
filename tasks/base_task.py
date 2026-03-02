@@ -142,6 +142,22 @@ class BaseTask(QObject):
         """
         pass
 
+    @pyqtSlot(str)
+    def set_sort_order(self, order_str):
+        if not self._sub_items:
+            return
+            
+        if order_str == "name_asc":
+            self._sub_items.sort(key=lambda x: str(x.get('name', '')).lower())
+        elif order_str == "name_desc":
+            self._sub_items.sort(key=lambda x: str(x.get('name', '')).lower(), reverse=True)
+        elif order_str == "size_asc":
+            self._sub_items.sort(key=lambda x: int(x.get('sizeBytes', 0)))
+        elif order_str == "size_desc":
+            self._sub_items.sort(key=lambda x: int(x.get('sizeBytes', 0)), reverse=True)
+            
+        self.subItemsChanged.emit()
+
 
 class BaseWorker(QThread):
     """

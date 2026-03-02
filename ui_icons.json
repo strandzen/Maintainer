@@ -12,8 +12,6 @@
         "recommended": "#27ae60",
         "advanced": "#f4d838",
         "sudo": "#da4453",
-        "ssd": "#ffffff",
-        "kill": "#ffffff",
         "running": "#ffffff"
     },
     "icons": {
@@ -21,12 +19,14 @@
         "app_main": "app-main.svg",
         "appimage_manager": "appimage_manager.svg",
         "boot_audit": "boot_audit.svg",
-        "check_update": "check_update.svg",
+        "check_update": "check_for_updates.svg",
+        "check_updates": "check_for_updates.svg",
         "clean": "clean.svg",
         "confirm": "confirm.svg",
         "corpse_cleaner": "corpse_cleaner.svg",
         "custom_scripts": "custom_scripts.svg",
-        "delete": "clean.svg",
+        "delete": "trash.svg",
+        "download": "download.svg",
         "error": "error.svg",
         "favorite": "favorite.svg",
         "home": "home.svg",
@@ -50,8 +50,10 @@
         "storage": "ssd.svg",
         "success": "success.svg",
         "sudo": "sudo.svg",
-        "trash": "clean.svg",
+        "trash": "trash.svg",
+        "upgrade": "download.svg",
         "url": "url.svg",
+        "empty_url": "empty_url.svg",
         "warning": "warning.svg"
     }
 }

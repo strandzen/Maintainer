@@ -42,15 +42,15 @@ Kirigami.ScrollablePage {
             }
 
             Switch {
-                Kirigami.FormData.label: UIStrings.ui.settings.label_developer_mode
-                checked: SettingsManager.developerMode
-                onCheckedChanged: SettingsManager.developerMode = checked
-            }
-
-            Switch {
                 Kirigami.FormData.label: "Check for Updates on Startup"
                 checked: SettingsManager.checkUpdatesOnStartup
                 onCheckedChanged: SettingsManager.checkUpdatesOnStartup = checked
+            }
+
+            Switch {
+                Kirigami.FormData.label: "Contrast Borders"
+                checked: SettingsManager.enableContrastBorders
+                onCheckedChanged: SettingsManager.enableContrastBorders = checked
             }
 
             // --- SECTION: Home Page ---
@@ -136,10 +136,10 @@ Kirigami.ScrollablePage {
                 onEditingFinished: SettingsManager.appImageDir = text
             }
 
-            // --- SECTION: Clean System Files ---
+            // --- SECTION: Clean System ---
             Label {
                 Kirigami.FormData.isSection: true
-                text: "Clean System Files"
+                text: "Clean System"
                 font.bold: true
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter

@@ -6,10 +6,12 @@ import org.kde.kirigami as Kirigami
 Rectangle {
     id: root
     color: UIColors.theme.queue_background_hex ? UIColors.theme.queue_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.queue_darker_multiplier)
-    border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor
+    border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
     border.width: 1
     radius: SettingsManager.cornerRadius
     clip: true
+
+    readonly property color effectiveHighlight: Kirigami.Theme.highlightColor
 
     property bool isRunning: TaskEngine.currentTask !== null
     property bool isFinished: !isRunning && TaskEngine.overallProgress === 1.0
@@ -87,6 +89,7 @@ Rectangle {
         anchors.margins: Kirigami.Units.largeSpacing
         spacing: Kirigami.Units.smallSpacing
         
+        
         Kirigami.Heading {
             text: isRunning ? UIStrings.ui.running.title : 
                   isFinished ? UIStrings.ui.finished.title : "Action Queue"
@@ -95,10 +98,11 @@ Rectangle {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
-            visible: false // Removed headline as requested
+            visible: root.isHomeActive && !isRunning && !isFinished
+            color: Kirigami.Theme.neutralTextColor
         }
 
-        Kirigami.Separator { Layout.fillWidth: true; opacity: 0.5; visible: false }
+        Kirigami.Separator { Layout.fillWidth: true; opacity: 0.5; visible: root.isHomeActive }
         
         // --- READY STATE (CHECKBOX LIST OR APPIMAGE LIST) ---
         Rectangle {
@@ -106,7 +110,7 @@ Rectangle {
             Layout.fillHeight: true
             visible: !!(isReady && currentModel && currentModel.rowCount() > 0)
             color: UIColors.theme.description_background_hex ? UIColors.theme.description_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.description_darker_multiplier)
-            border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor
+            border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
             border.width: 0 // Removed border as requested
             radius: Kirigami.Units.smallSpacing
             clip: true
@@ -131,7 +135,7 @@ Rectangle {
                         height: implicitHeight
                         
                         background: Rectangle {
-                            color: readyDelegate.hovered ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.1) : "transparent"
+                            color: readyDelegate.hovered ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.1) : "transparent"
                         }
 
                         contentItem: ColumnLayout {
@@ -144,7 +148,7 @@ Rectangle {
                                 CheckBox {
                                     id: cbox
                                     checked: model.isChecked || false
-                                    visible: model.name !== "Boot Audit" && !root.isCompact
+                                    visible: !root.isCompact
                                     onCheckedChanged: {
                                         if (model.isChecked !== checked) {
                                             model.isChecked = checked
@@ -179,8 +183,7 @@ Rectangle {
 
                                 RowLayout {
                                     spacing: Kirigami.Units.smallSpacing
-                                    Layout.alignment: root.isCompact ? Qt.AlignHCenter : (Qt.AlignVCenter | Qt.AlignRight)
-                                    Layout.fillWidth: root.isCompact
+                                    Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                                     
 
                                     // Existing Task Icons
@@ -221,7 +224,7 @@ Rectangle {
                                         Layout.preferredWidth: Kirigami.Units.iconSizes.small
                                         Layout.preferredHeight: Kirigami.Units.iconSizes.small
                                         isMask: UIIcons.shouldColorize("sudo")
-                                        color: UIIcons.iconColor("sudo", Kirigami.Theme.highlightColor)
+                                        color: UIIcons.iconColor("sudo", root.effectiveHighlight)
                                         
                                         HoverHandler { id: sudoHover }
                                         ToolTip.text: UIStrings.ui.selection.tooltip_sudo || "Sudo required"
@@ -233,21 +236,7 @@ Rectangle {
                                         text: model.reclaimedSpace ? model.reclaimedSpace : ""
                                         font.pointSize: Kirigami.Theme.smallFont.pointSize
                                         color: Kirigami.Theme.neutralTextColor
-                                        visible: !root.isCompact && text !== "" && model.name !== "Boot Audit"
-                                    }
-
-                                    Button {
-                                        text: "Audit"
-                                        visible: model.name === "Boot Audit"
-                                        Layout.alignment: Qt.AlignVCenter
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
-                                        onClicked: {
-                                            if (myPageStack) {
-                                                myPageStack.replace(Qt.resolvedUrl("../pages/EfiAuditPage.qml"), {
-                                                    "taskModel": activeTaskModel
-                                                })
-                                            }
-                                        }
+                                        visible: !root.isCompact && text !== ""
                                     }
                                 }
                             }
@@ -257,9 +246,7 @@ Rectangle {
                             }
                         }
                         onClicked: {
-                            if (model.name !== "Boot Audit") {
-                                cbox.checked = !cbox.checked
-                            }
+                            cbox.checked = !cbox.checked
                         }
                     }
                 }
@@ -287,7 +274,7 @@ Rectangle {
             Layout.fillHeight: true
             visible: !isReady && TaskEngine.queue.length > 0
             color: UIColors.theme.description_background_hex ? UIColors.theme.description_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.description_darker_multiplier)
-            border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor
+            border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
             border.width: 0 // Removed border as requested
             radius: Kirigami.Units.smallSpacing
             clip: true
@@ -311,7 +298,7 @@ Rectangle {
                         height: visible ? implicitHeight : 0
                         
                         background: Rectangle {
-                            color: runningDelegate.hovered ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.1) : "transparent"
+                            color: runningDelegate.hovered ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.1) : "transparent"
                         }
 
                         contentItem: ColumnLayout {
@@ -449,9 +436,9 @@ Rectangle {
                 }
             }
             background: Rectangle {
-                color: parent.down ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.2) : 
-                       parent.hovered ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.1) : "transparent"
-                border.color: Kirigami.Theme.highlightColor
+                color: parent.down ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.2) : 
+                       parent.hovered ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.1) : "transparent"
+                border.color: root.effectiveHighlight
                 border.width: 1
                 radius: Kirigami.Units.smallSpacing
             }
@@ -460,7 +447,7 @@ Rectangle {
         Label {
             text: UIStrings.ui.landing.potential_savings + (TaskRegistry.recommendedTasksModel ? TaskRegistry.recommendedTasksModel.totalReclaimedSpaceStr : "")
             font.pointSize: Kirigami.Theme.smallFont.pointSize
-            color: "#ff8c00" // Standardize to orange from Image 1
+            color: SettingsManager.emphasisColor
             Layout.alignment: Qt.AlignHCenter
             visible: !root.isCompact && isReady && isHomeActive && selectedCount === 0 && TaskRegistry.recommendedTasksModel && TaskRegistry.recommendedTasksModel.totalPossibleReclaimedSpaceBytes > 0
             horizontalAlignment: Text.AlignHCenter
@@ -471,7 +458,7 @@ Rectangle {
         Label {
             text: activeTaskModel && activeTaskModel.totalReclaimedSpaceStr ? activeTaskModel.totalReclaimedSpaceStr : ""
             font.pointSize: Kirigami.Theme.smallFont.pointSize
-            color: "#ff8c00" // Standardize to orange from Image 1
+            color: SettingsManager.emphasisColor
             Layout.alignment: Qt.AlignHCenter
             visible: !root.isCompact && isReady && selectedCount > 0 && text !== ""
             horizontalAlignment: Text.AlignHCenter
@@ -499,20 +486,20 @@ Rectangle {
                         height: Kirigami.Units.iconSizes.smallMedium
                         anchors.verticalCenter: parent.verticalCenter
                         isMask: UIIcons.shouldColorize("run")
-                        color: UIIcons.iconColor("run", Kirigami.Theme.highlightColor)
+                        color: UIIcons.iconColor("run", root.effectiveHighlight)
                     }
                     Label {
                         text: "Run (" + selectedCount + ")"
                         visible: !root.isCompact
-                        color: Kirigami.Theme.textColor
+                        color: root.effectiveHighlight
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
             }
             background: Rectangle {
-                color: runSelectedBtn.down ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.2) : 
-                       runSelectedBtn.hovered ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.1) : "transparent"
-                border.color: Kirigami.Theme.highlightColor
+                color: runSelectedBtn.down ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.2) : 
+                       runSelectedBtn.hovered ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.1) : "transparent"
+                border.color: root.effectiveHighlight
                 border.width: 1
                 radius: Kirigami.Units.smallSpacing
             }
@@ -543,7 +530,7 @@ Rectangle {
                     }
                     Label {
                         text: "Confirm"
-                        color: Kirigami.Theme.textColor
+                        color: Kirigami.Theme.positiveTextColor
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                         Layout.fillWidth: true
@@ -566,7 +553,7 @@ Rectangle {
                     }
                     Label {
                         text: "Quit"
-                        color: Kirigami.Theme.textColor
+                        color: Kirigami.Theme.negativeTextColor
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                         Layout.fillWidth: true
@@ -589,7 +576,7 @@ Rectangle {
                     }
                     Label {
                         text: "Reboot"
-                        color: Kirigami.Theme.textColor
+                        color: Kirigami.Theme.highlightColor
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                         Layout.fillWidth: true

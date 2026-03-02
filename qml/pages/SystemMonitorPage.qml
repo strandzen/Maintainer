@@ -28,9 +28,11 @@ Kirigami.Page {
         return SystemHealth.sortAscending ? " ▲" : " ▼"
     }
 
+    readonly property color effectiveHighlight: Kirigami.Theme.highlightColor
+
     function headerColor(col) {
         return SystemHealth.sortColumn === col
-            ? Kirigami.Theme.highlightColor
+            ? page.effectiveHighlight
             : (UIColors.theme.neutral_text_hex || Kirigami.Theme.neutralTextColor)
     }
 
@@ -39,9 +41,7 @@ Kirigami.Page {
         color: UIColors.theme.queue_background_hex
             ? UIColors.theme.queue_background_hex
             : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.queue_darker_multiplier)
-        border.color: UIColors.theme.border_color_hex
-            ? UIColors.theme.border_color_hex
-            : Kirigami.Theme.highlightColor
+        border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
         border.width: 1
         radius: SettingsManager.cornerRadius
         clip: true
@@ -100,7 +100,7 @@ Kirigami.Page {
                             currentText: (SystemHealth.cpuUsage * 100).toFixed(1) + "%"
                             values: SystemHealth.cpuHistory
                             autoScale: false
-                            accentColor: Kirigami.Theme.highlightColor
+                            accentColor: SettingsManager.cpuColor || page.effectiveHighlight
                         }
 
                         // Memory
@@ -111,7 +111,7 @@ Kirigami.Page {
                             currentText: SystemHealth.ramTotalStr
                             values: SystemHealth.ramHistory
                             autoScale: false
-                            accentColor: Kirigami.Theme.positiveTextColor
+                            accentColor: SettingsManager.memoryColor || Kirigami.Theme.positiveTextColor
                         }
 
                         // Download
@@ -122,7 +122,7 @@ Kirigami.Page {
                             currentText: page.formatSpeed(SystemHealth.netDownload)
                             values: SystemHealth.netDownHistory
                             autoScale: true
-                            accentColor: Kirigami.Theme.positiveTextColor
+                            accentColor: SettingsManager.downloadColor || Kirigami.Theme.positiveTextColor
                         }
 
                         // Upload
@@ -133,7 +133,7 @@ Kirigami.Page {
                             currentText: page.formatSpeed(SystemHealth.netUpload)
                             values: SystemHealth.netUpHistory
                             autoScale: true
-                            accentColor: Kirigami.Theme.neutralTextColor
+                            accentColor: SettingsManager.uploadColor || Kirigami.Theme.neutralTextColor
                         }
                     }
 
@@ -144,9 +144,7 @@ Kirigami.Page {
                         color: UIColors.theme.description_background_hex
                             ? UIColors.theme.description_background_hex
                             : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.description_darker_multiplier)
-                        border.color: UIColors.theme.border_color_hex
-                            ? UIColors.theme.border_color_hex
-                            : Kirigami.Theme.highlightColor
+                        border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
                         border.width: 1
                         radius: SettingsManager.cornerRadius / 2
 
@@ -203,7 +201,7 @@ Kirigami.Page {
                                 Kirigami.ShadowedRectangle {
                                     height: parent.height
                                     width: parent.width * SystemHealth.swapUsage
-                                    color: Kirigami.Theme.neutralTextColor
+                                    color: SettingsManager.swapColor || Kirigami.Theme.neutralTextColor
                                     visible: width > 0
                                     corners.topLeftRadius: swapFrame.radius
                                     corners.bottomLeftRadius: swapFrame.radius
@@ -417,8 +415,8 @@ Kirigami.Page {
                                         spacing: Kirigami.Units.smallSpacing
 
                                         ToolButton {
-                                            implicitWidth: Kirigami.Units.gridUnit * 2
-                                            implicitHeight: Kirigami.Units.gridUnit * 2
+                                            implicitWidth: Kirigami.Units.iconSizes.smallMedium
+                                            implicitHeight: Kirigami.Units.iconSizes.smallMedium
                                             visible: model.exe !== ""
                                             onClicked: SystemHealth.open_file_location(model.pid)
                                             ToolTip.text: "Open Folder Location"
@@ -428,17 +426,13 @@ Kirigami.Page {
                                                 implicitWidth: Kirigami.Units.iconSizes.small
                                                 implicitHeight: Kirigami.Units.iconSizes.small
                                                 isMask: true
-                                                color: {
-                                                    let c = UIIcons.iconColor("ssd", "")
-                                                    if (c === "#ffffff") return "#ffffff"
-                                                    return c || Kirigami.Theme.highlightColor
-                                                }
+                                                color: Kirigami.Theme.textColor
                                             }
                                         }
 
                                         ToolButton {
-                                            implicitWidth: Kirigami.Units.gridUnit * 2
-                                            implicitHeight: Kirigami.Units.gridUnit * 2
+                                            implicitWidth: Kirigami.Units.iconSizes.smallMedium
+                                            implicitHeight: Kirigami.Units.iconSizes.smallMedium
                                             onClicked: SystemHealth.kill_process(model.pid)
                                             ToolTip.text: "Kill Process"
                                             ToolTip.visible: hovered
@@ -447,11 +441,7 @@ Kirigami.Page {
                                                 implicitWidth: Kirigami.Units.iconSizes.small
                                                 implicitHeight: Kirigami.Units.iconSizes.small
                                                 isMask: true
-                                                color: {
-                                                    let c = UIIcons.iconColor("kill", "")
-                                                    if (c === "#ffffff") return "#ffffff"
-                                                    return c || Kirigami.Theme.highlightColor
-                                                }
+                                                color: Kirigami.Theme.negativeTextColor
                                             }
                                         }
                                     }

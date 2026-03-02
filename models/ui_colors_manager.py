@@ -29,3 +29,4 @@ class UIColorsManager(JSONConfigManager):
     @pyqtProperty('QVariantMap', notify=uiColorsChanged)
     def theme(self):
         return self._colors
+

@@ -26,6 +26,7 @@ ApplicationWindow {
     // Sidebar State
     property string currentSidebarId: "home"
 
+    readonly property color effectiveHighlight: Kirigami.Theme.highlightColor
 
     // Custom Header removed. Relying on system window decorations.
 
@@ -72,7 +73,7 @@ ApplicationWindow {
             SplitView.maximumWidth: leftSidebarLayout.implicitWidth
             
             color: UIColors.theme.sidebar_background_hex ? UIColors.theme.sidebar_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.sidebar_darker_multiplier)
-            border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor
+            border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
             border.width: 1
             radius: SettingsManager.cornerRadius
             clip: true // Prevents children from spilling out of rounded corners
@@ -159,10 +160,6 @@ ApplicationWindow {
                             } else if (itemModel.modelType === "category") {
                                 if (itemModel.modelId === "corpse_cleaner") {
                                     myPageStack.replace(Qt.resolvedUrl("pages/CorpseCleanerPage.qml"));
-                                } else if (itemModel.modelId === "boot_audit") {
-                                    myPageStack.replace(Qt.resolvedUrl("pages/EfiAuditPage.qml"), {
-                                        "taskModel": TaskRegistry.getModelForCategory(itemModel.modelId)
-                                    });
                                 } else {
                                     var specificModel = TaskRegistry.getModelForCategory(itemModel.modelId);
                                     myPageStack.replace(Qt.resolvedUrl("pages/TaskSelectionPage.qml"), {
@@ -184,10 +181,9 @@ ApplicationWindow {
         // 2. Central Content
         ColumnLayout {
             id: centerColumn
-            SplitView.fillWidth: myPageStack.currentItem && myPageStack.currentItem.objectName !== "packageManagerPage" && myPageStack.currentItem.objectName !== "appImageManagerPage"
+            SplitView.fillWidth: myPageStack.currentItem && (myPageStack.currentItem.objectName === "landingPage" || myPageStack.currentItem.objectName === "systemMonitorPage" || myPageStack.currentItem.objectName === "settingsPage")
             Layout.preferredWidth: visible ? -1 : 0
-            visible: !myPageStack.currentItem || (myPageStack.currentItem.objectName !== "packageManagerPage" && myPageStack.currentItem.objectName !== "appImageManagerPage")
-            
+            visible: !myPageStack.currentItem || (myPageStack.currentItem.objectName === "landingPage" || myPageStack.currentItem.objectName === "systemMonitorPage" || myPageStack.currentItem.objectName === "settingsPage")
             Kirigami.PageRow {
                 id: myPageStack
                 Layout.fillWidth: true
@@ -202,9 +198,9 @@ ApplicationWindow {
         // 3. Right Progress
         Loader {
             id: rightPaneLoader
-            SplitView.fillWidth: myPageStack.currentItem && (myPageStack.currentItem.objectName === "packageManagerPage" || myPageStack.currentItem.objectName === "appImageManagerPage")
+            SplitView.fillWidth: myPageStack.currentItem && (myPageStack.currentItem.objectName !== "landingPage" && myPageStack.currentItem.objectName !== "systemMonitorPage" && myPageStack.currentItem.objectName !== "settingsPage")
             SplitView.preferredWidth: {
-                if (myPageStack.currentItem && (myPageStack.currentItem.objectName === "packageManagerPage" || myPageStack.currentItem.objectName === "appImageManagerPage")) return -1;
+                if (myPageStack.currentItem && (myPageStack.currentItem.objectName !== "landingPage" && myPageStack.currentItem.objectName !== "systemMonitorPage" && myPageStack.currentItem.objectName !== "settingsPage")) return -1;
                 return item && item.idealWidth ? item.idealWidth : Kirigami.Units.gridUnit * 18
             }
             SplitView.minimumWidth: Kirigami.Units.gridUnit * 10
@@ -217,9 +213,6 @@ ApplicationWindow {
                 if (!myPageStack.currentItem) return null;
                 if (myPageStack.currentItem.objectName === "corpseCleanerPage") {
                     return corpseCleanerComponent;
-                }
-                if (myPageStack.currentItem.objectName === "efiAuditPage") {
-                    return efiAuditComponent;
                 }
                 if (myPageStack.currentItem.objectName === "packageManagerPage") {
                     return packageManagerComponent;
@@ -247,14 +240,6 @@ ApplicationWindow {
             MyComponents.CorpseCleanerPane {
                 anchors.fill: parent
                 // The corpseCleanerPage exposes myTask. Note: myPageStack.currentItem is the CorpseCleanerPage
-                activeTask: myPageStack.currentItem ? myPageStack.currentItem.myTask : null
-            }
-        }
-        
-        Component {
-            id: efiAuditComponent
-            MyComponents.EfiAuditPane {
-                anchors.fill: parent
                 activeTask: myPageStack.currentItem ? myPageStack.currentItem.myTask : null
             }
         }
@@ -297,7 +282,7 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 12
                 color: UIColors.theme.description_background_hex ? UIColors.theme.description_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.description_darker_multiplier)
-                border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor
+                border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
                 border.width: 1
                 radius: SettingsManager.cornerRadius / 2
                 clip: true
@@ -390,176 +375,28 @@ ApplicationWindow {
                 Button {
                     id: globalCleanBtn
                     text: "Clean Now"
-                    icon.source: UIIcons.icons.delete || ""
-                    icon.color: UIIcons.iconColor("delete", Kirigami.Theme.highlightColor)
-                    onClicked: {
-                        console.log("Global Clean Now clicked!");
-                        globalConfirmSheet.close()
-                        if (mainWindow.activeCleaningTask) {
-                            console.log("Executing active cleaning task...");
-                            mainWindow.activeCleaningTask.execute()
-                        } else {
-                            console.log("No active cleaning task found!");
-                        }
-                    }
-                    background: Rectangle {
-                        color: globalCleanBtn.down ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.4) : 
-                               globalCleanBtn.hovered ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.3) :
-                               Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.2)
-                        radius: Kirigami.Units.smallSpacing
-                        border.color: Kirigami.Theme.highlightColor
-                        border.width: 1
-                    }
-                    contentItem: Label {
-                        text: globalCleanBtn.text
-                        color: Kirigami.Theme.highlightColor
-                        font.weight: Font.Bold
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                }
-            }
-        }
-    }
-
-    // Global Confirmation Sheet for Boot Audit
-    Kirigami.OverlaySheet {
-        id: efiAuditConfirmSheet
-        title: UIStrings.ui.boot_audit.confirm_title
-        width: Math.min(Kirigami.Units.gridUnit * 40, mainWindow.width * 0.9)
-        
-        ColumnLayout {
-            id: auditLayout
-            spacing: Kirigami.Units.largeSpacing
-            width: Kirigami.Units.gridUnit * 38
-            anchors.horizontalCenter: parent.horizontalCenter
-            
-            Label {
-                text: UIStrings.ui.boot_audit.confirm_description
-                wrapMode: Text.WordWrap
-                color: Kirigami.Theme.negativeTextColor
-                font.weight: Font.DemiBold
-                Layout.fillWidth: true
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 12
-                color: UIColors.theme.description_background_hex ? UIColors.theme.description_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.description_darker_multiplier)
-                border.color: Kirigami.Theme.negativeTextColor
-                border.width: 1
-                radius: SettingsManager.cornerRadius / 2
-                clip: true
-
-                ListView {
-                    id: efiAuditConfirmListView
-                    anchors.fill: parent
-                    anchors.margins: Kirigami.Units.smallSpacing
-                    model: efiAuditConfirmSheet.visible ? mainWindow.confirmItems : []
-                    ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
-                    clip: true
-                    
-                    delegate: ItemDelegate {
-                        width: ListView.view.width
-                        contentItem: RowLayout {
+                    contentItem: Item {
+                        implicitWidth: rowGlobalClean.implicitWidth
+                        implicitHeight: rowGlobalClean.implicitHeight
+                        Row {
+                            id: rowGlobalClean
+                            anchors.centerIn: parent
                             spacing: Kirigami.Units.smallSpacing
-                            Layout.topMargin: 2
-                            Layout.bottomMargin: 2
-                            
-                            Button {
-                                icon.source: UIIcons.icons.delete || ""
-                                icon.color: UIIcons.iconColor("delete", Kirigami.Theme.negativeTextColor)
-                                ToolTip.text: "Remove from selection"
-                                ToolTip.visible: hovered
-                                ToolTip.delay: Kirigami.Units.toolTipDelay
-                                onClicked: {
-                                    if (mainWindow.activeCleaningTask) {
-                                        let realIdx = modelData.originalIndex;
-                                        let items = mainWindow.activeCleaningTask.subItems;
-                                        if (realIdx >= 0 && realIdx < items.length) {
-                                            items[realIdx].checked = false;
-                                        }
-                                        mainWindow.activeCleaningTask.set_sub_item_checked(realIdx, false);
-                                        mainWindow.confirmUpdateTrigger++;
-                                        
-                                        // Update the local list
-                                        let newList = [];
-                                        for (let i=0; i<items.length; i++) {
-                                            if (items[i].checked) {
-                                                newList.push({
-                                                    "name": items[i].name,
-                                                    "sizeBytes": items[i].sizeBytes,
-                                                    "details": items[i].details,
-                                                    "originalIndex": i
-                                                });
-                                            }
-                                        }
-                                        mainWindow.confirmItems = newList;
-
-                                        if (newList.length === 0) {
-                                            efiAuditConfirmSheet.close();
-                                        }
-                                    }
-                                }
+                            Kirigami.Icon {
+                                source: UIIcons.icons.delete || ""
+                                width: Kirigami.Units.iconSizes.smallMedium
+                                height: Kirigami.Units.iconSizes.smallMedium
+                                anchors.verticalCenter: parent.verticalCenter
+                                isMask: true
+                                color: UIIcons.iconColor("delete", Kirigami.Theme.negativeTextColor)
                             }
-                            
-                            ColumnLayout {
-                                spacing: 0
-                                Layout.fillWidth: true
-                                
-                                Label {
-                                    text: modelData.name
-                                    elide: Text.ElideRight
-                                    Layout.fillWidth: true
-                                    font.weight: Font.DemiBold
-                                    color: Kirigami.Theme.textColor
-                                }
-                                
-                                Label {
-                                    text: modelData.details
-                                    elide: Text.ElideRight
-                                    Layout.fillWidth: true
-                                    color: Kirigami.Theme.neutralTextColor
-                                    font.pointSize: Kirigami.Theme.smallFont.pointSize
-                                }
+                            Label {
+                                text: globalCleanBtn.text
+                                color: Kirigami.Theme.negativeTextColor
+                                font.weight: Font.Bold
+                                anchors.verticalCenter: parent.verticalCenter
                             }
                         }
-                    }
-                }
-            }
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Kirigami.Units.largeSpacing
-                
-                Button {
-                    text: "Cancel"
-                    Layout.fillWidth: true
-                    onClicked: efiAuditConfirmSheet.close()
-                }
-                
-                Button {
-                    id: efiCleanBtn
-                    text: UIStrings.ui.boot_audit.btn_remove_now
-                    icon.name: "delete"
-                    onClicked: {
-                        efiAuditConfirmSheet.close()
-                        if (mainWindow.activeCleaningTask) {
-                            mainWindow.activeCleaningTask.execute()
-                        }
-                    }
-                    background: Rectangle {
-                        color: efiCleanBtn.down ? Qt.rgba(Kirigami.Theme.negativeTextColor.r, Kirigami.Theme.negativeTextColor.g, Kirigami.Theme.negativeTextColor.b, 0.4) : 
-                               efiCleanBtn.hovered ? Qt.rgba(Kirigami.Theme.negativeTextColor.r, Kirigami.Theme.negativeTextColor.g, Kirigami.Theme.negativeTextColor.b, 0.3) :
-                               Qt.rgba(Kirigami.Theme.negativeTextColor.r, Kirigami.Theme.negativeTextColor.g, Kirigami.Theme.negativeTextColor.b, 0.2)
-                        radius: Kirigami.Units.smallSpacing
-                        border.color: Kirigami.Theme.negativeTextColor
-                        border.width: 1
-                    }
-                    contentItem: Label {
-                        text: efiCleanBtn.text
-                        color: Kirigami.Theme.negativeTextColor
-                        font.weight: Font.Bold
-                        horizontalAlignment: Text.AlignHCenter
                     }
                 }
             }
@@ -571,13 +408,6 @@ ApplicationWindow {
         mainWindow.confirmItems = items;
         mainWindow.confirmTotal = total;
         globalConfirmSheet.open();
-    }
-
-    function openEfiAuditConfirmation(task, items) {
-        mainWindow.activeCleaningTask = task;
-        mainWindow.confirmItems = items;
-        mainWindow.confirmTotal = "";
-        efiAuditConfirmSheet.open();
     }
 
     function calculateTotal(items) {

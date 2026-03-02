@@ -8,6 +8,8 @@ Item {
     implicitHeight: layout.implicitHeight + Kirigami.Units.smallSpacing * 2
     implicitWidth: 300
     
+    readonly property color effectiveHighlight: Kirigami.Theme.highlightColor
+
     // Properties to bind from SystemHealth
     property real appsSize: 0
     property real mediaSize: 0
@@ -80,7 +82,7 @@ Item {
                 Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.appsSize / root.totalDiskSize) * parent.width : 0
-                    color: Kirigami.Theme.highlightColor
+                    color: root.effectiveHighlight
                     visible: width > 0
                     corners.topLeftRadius: isFirstVisible(0) ? barFrame.radius : 0
                     corners.bottomLeftRadius: isFirstVisible(0) ? barFrame.radius : 0
@@ -220,7 +222,7 @@ Item {
             // Packages
             Row {
                 spacing: Kirigami.Units.smallSpacing
-                Rectangle { width: 8; height: 8; radius: 4; color: Kirigami.Theme.highlightColor; anchors.verticalCenter: parent.verticalCenter }
+                Rectangle { width: 8; height: 8; radius: 4; color: root.effectiveHighlight; anchors.verticalCenter: parent.verticalCenter }
                 Label { text: "Packages"; font.pointSize: Kirigami.Theme.smallFont.pointSize; color: Kirigami.Theme.disabledTextColor }
             }
             // Games

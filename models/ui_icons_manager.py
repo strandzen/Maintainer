@@ -30,6 +30,8 @@ class UIIconsManager(JSONConfigManager):
         "storage": "ssd.svg",
         "success": "success.svg",
         "trash": "clean.svg",
+        "url": "url.svg",
+        "empty_url": "empty_url.svg",
         "warning": "warning.svg"
     }
 

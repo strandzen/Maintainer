@@ -7,7 +7,7 @@ import "../Utils.js" as Utils
 Rectangle {
     id: paneRoot
     color: UIColors.theme.queue_background_hex ? UIColors.theme.queue_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.queue_darker_multiplier)
-    border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor
+    border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
     border.width: 1
     radius: SettingsManager.cornerRadius
     clip: true
@@ -244,7 +244,7 @@ Rectangle {
             Layout.fillHeight: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 10 // Minimum height so it collapses, letting bottom buttons show
             color: UIColors.theme.description_background_hex ? UIColors.theme.description_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.description_darker_multiplier)
-            border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor
+            border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
             border.width: 0 // Removed border as requested
             radius: Kirigami.Units.smallSpacing
             clip: true
@@ -604,14 +604,31 @@ Rectangle {
             Button {
                 id: checkBtn
                 Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
                 visible: paneRoot.selectedCount === 0 && PackageManager.mode === "installed"
                 enabled: !PackageManager.isCheckingUpdates && !PackageManager.isLoading
                         && !PackageManager.isUpgrading && !PackageManager.isRemoving
-                contentItem: Label {
-                    text: PackageManager.isCheckingUpdates ? "Checking…" : "Check Updates"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    color: checkBtn.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
+                contentItem: Item {
+                    implicitWidth: row1.implicitWidth
+                    implicitHeight: row1.implicitHeight
+                    Row {
+                        id: row1
+                        anchors.centerIn: parent
+                        spacing: Kirigami.Units.smallSpacing
+                        Kirigami.Icon {
+                            source: UIIcons.icons.check_update || ""
+                            width: Kirigami.Units.iconSizes.smallMedium
+                            height: Kirigami.Units.iconSizes.smallMedium
+                            anchors.verticalCenter: parent.verticalCenter
+                            isMask: UIIcons.shouldColorize("check_update")
+                            color: UIIcons.iconColor("check_update", checkBtn.enabled ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor)
+                        }
+                        Label {
+                            text: PackageManager.isCheckingUpdates ? "Checking…" : "Check Updates"
+                            color: checkBtn.enabled ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
                 }
                 background: Rectangle {
                     color: checkBtn.down
@@ -630,16 +647,33 @@ Rectangle {
             Button {
                 id: upgradeBtn
                 Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
                 visible: paneRoot.selectedCount === 0 && PackageManager.mode === "installed"
                 enabled: !PackageManager.isUpgrading && !PackageManager.isLoading
                         && !PackageManager.isRemoving
-                contentItem: Label {
-                    text: PackageManager.isUpgrading
-                        ? "Upgrading…"
-                        : (PackageManager.updateCount > 0 ? "Upgrade System (" + PackageManager.updateCount + ")" : "Full System Upgrade")
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    color: upgradeBtn.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
+                contentItem: Item {
+                    implicitWidth: row2.implicitWidth
+                    implicitHeight: row2.implicitHeight
+                    Row {
+                        id: row2
+                        anchors.centerIn: parent
+                        spacing: Kirigami.Units.smallSpacing
+                        Kirigami.Icon {
+                            source: UIIcons.icons.download || ""
+                            width: Kirigami.Units.iconSizes.smallMedium
+                            height: Kirigami.Units.iconSizes.smallMedium
+                            anchors.verticalCenter: parent.verticalCenter
+                            isMask: UIIcons.shouldColorize("download")
+                            color: UIIcons.iconColor("download", upgradeBtn.enabled ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.disabledTextColor)
+                        }
+                        Label {
+                            text: PackageManager.isUpgrading
+                                ? "Upgrading…"
+                                : (PackageManager.updateCount > 0 ? "Upgrade System (" + PackageManager.updateCount + ")" : "Full System Upgrade")
+                            color: upgradeBtn.enabled ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.disabledTextColor
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
                 }
                 background: Rectangle {
                     color: upgradeBtn.down
@@ -672,23 +706,41 @@ Rectangle {
             Button {
                 id: removeBtn
                 Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
                 visible: true
                 enabled: paneRoot.selectedCount > 0 && !PackageManager.isRemoving && !PackageManager.isLoading
                         && !PackageManager.isUpgrading && !PackageManager.isDryRunning
                         && paneRoot.confirmChecked
-
-                contentItem: Label {
-                    text: {
-                        if (PackageManager.isRemoving) return PackageManager.mode === "installed" ? "Removing…" : "Installing…"
-                        let actionWord = PackageManager.mode === "installed" ? "Remove" : "Install"
-                        if (paneRoot.selectedCount === 0) return actionWord
-                        actionWord = actionWord + " Selected"
-                        return actionWord + " (" + paneRoot.selectedCount + ")"
+                
+                contentItem: Item {
+                    implicitWidth: row3.implicitWidth
+                    implicitHeight: row3.implicitHeight
+                    Row {
+                        id: row3
+                        anchors.centerIn: parent
+                        spacing: Kirigami.Units.smallSpacing
+                        Kirigami.Icon {
+                            source: PackageManager.mode === "installed" ? (UIIcons.icons.delete || "") : (UIIcons.icons.download || "")
+                            width: Kirigami.Units.iconSizes.smallMedium
+                            height: Kirigami.Units.iconSizes.smallMedium
+                            anchors.verticalCenter: parent.verticalCenter
+                            isMask: true
+                            color: PackageManager.mode === "installed" 
+                                        ? UIIcons.iconColor("delete", removeBtn.enabled ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.disabledTextColor)
+                                        : UIIcons.iconColor("download", removeBtn.enabled ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.disabledTextColor)
+                        }
+                        Label {
+                            text: {
+                                if (PackageManager.isRemoving) return PackageManager.mode === "installed" ? "Removing…" : "Installing…"
+                                let actionWord = PackageManager.mode === "installed" ? "Remove" : "Install"
+                                if (paneRoot.selectedCount === 0) return actionWord
+                                actionWord = actionWord + " Selected"
+                                return actionWord + " (" + paneRoot.selectedCount + ")"
+                            }
+                            color: removeBtn.enabled ? (PackageManager.mode === "installed" ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor) : Kirigami.Theme.disabledTextColor
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
                     }
-                    elide: Text.ElideRight
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    color: removeBtn.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
                 }
 
                 background: Rectangle {

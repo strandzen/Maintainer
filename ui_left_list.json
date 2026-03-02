@@ -35,11 +35,6 @@
         "hidden": false
     },
     {
-        "id": "boot_audit",
-        "type": "category",
-        "hidden": true
-    },
-    {
         "id": "clean_system",
         "type": "category",
         "hidden": false
@@ -47,7 +42,7 @@
     {
         "id": "corpse_cleaner",
         "type": "category",
-        "hidden": true
+        "hidden": false
     },
     {
         "id": "custom_scripts",

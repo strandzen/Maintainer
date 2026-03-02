@@ -206,31 +206,48 @@ class UpdateCheckWorker(QThread):
     def run(self):
         try:
             env = {**os.environ, "NO_COLOR": "1"}
-            # We removed the silent -Sy because it requires root and can cause background failures.
-            # The app trusts the system/user keeps the database synced, or triggers -Syu via the Upgrade button.
-            cmd = [self.aur_helper, "-Qu"]
-            proc = subprocess.run(
-                cmd,
-                capture_output=True, text=True, env=env
-            )
-            names = []
-            # pacman/paru -Qu return 0 if updates exist, 1 if no updates.
-            if proc.returncode == 0:
-                for line in proc.stdout.splitlines():
-                    parts = line.split()
-                    if parts:
-                        name = parts[0]
-                        # Strip any repo prefix (e.g., 'aur/pkgname' or 'extra/pkgname')
-                        if "/" in name:
-                            name = name.split("/")[-1]
-                        names.append(name)
-            elif proc.returncode != 1:
-                # If code is not 0 or 1, it's likely a real error (like helper not found or db locked)
-                print(f"[UpdateCheck] {self.aur_helper} -Qu failed with code {proc.returncode}")
-                if proc.stderr:
-                    print(f"[UpdateCheck] Stderr: {proc.stderr.strip()}")
-                    
-            self.result.emit(names)
+            names = set()
+            
+            # 1. Check Official Repos using 'checkupdates' (safest non-root way)
+            try:
+                print("[UpdateCheck] Running checkupdates...")
+                proc_sync = subprocess.run(["checkupdates"], capture_output=True, text=True, env=env)
+                if proc_sync.returncode == 0 and proc_sync.stdout:
+                    for line in proc_sync.stdout.splitlines():
+                        parts = line.split()
+                        if parts:
+                            names.add(parts[0].strip().lower())
+                elif proc_sync.returncode != 1: # 1 means no updates
+                    print(f"[UpdateCheck] checkupdates failed with code {proc_sync.returncode}")
+                    if proc_sync.stderr:
+                        print(f"[UpdateCheck] checkupdates stderr: {proc_sync.stderr.strip()}")
+            except Exception as e:
+                print(f"[UpdateCheck] Error running checkupdates: {e}")
+
+            # 2. Check AUR using 'paru -Qua' (AUR check only)
+            if self.aur_helper == "paru":
+                try:
+                    print("[UpdateCheck] Running paru -Qua...")
+                    proc_aur = subprocess.run(["paru", "-Qua"], capture_output=True, text=True, env=env)
+                    if proc_aur.returncode == 0 and proc_aur.stdout:
+                        for line in proc_aur.stdout.splitlines():
+                            parts = line.split()
+                            if parts:
+                                name = parts[0].strip().lower()
+                                if "/" in name:
+                                    name = name.split("/")[-1]
+                                names.add(name)
+                    elif proc_aur.returncode != 1:
+                        print(f"[UpdateCheck] paru -Qua failed with code {proc_aur.returncode}")
+                except Exception as e:
+                    print(f"[UpdateCheck] Error running paru -Qua: {e}")
+
+            final_list = list(names)
+            print(f"[UpdateCheck] Total updates found: {len(final_list)}")
+            if final_list:
+                print(f"[UpdateCheck] Sample updates: {', '.join(final_list[:5])}")
+                
+            self.result.emit(final_list)
         except Exception as e:
             print(f"[PackageManager] update check error: {e}")
             self.result.emit([])
@@ -615,6 +632,7 @@ class PackageManager(QObject):
     depsReady                = pyqtSignal(list, str)
     removalDone              = pyqtSignal(bool)
     pkgbuildContentChanged   = pyqtSignal()
+    upgradeActionTriggered   = pyqtSignal(str)
     sortOrderChanged         = pyqtSignal()
 
     def __init__(self, settings_manager=None, parent=None):

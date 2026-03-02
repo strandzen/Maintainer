@@ -7,11 +7,13 @@ import "../Utils.js" as Utils
 Rectangle {
     id: paneRoot
     color: UIColors.theme.queue_background_hex ? UIColors.theme.queue_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.queue_darker_multiplier)
-    border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor
+    border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
     border.width: 1
     radius: SettingsManager.cornerRadius
     clip: true
     
+    readonly property color effectiveHighlight: Kirigami.Theme.highlightColor
+
     // Pass the task object from main.qml via Loader properties
     property var activeTask: null
     property int updateTrigger: 0
@@ -38,7 +40,7 @@ Rectangle {
                 if (measureText.width > maxW) maxW = measureText.width;
             }
         }
-        return Math.max(Kirigami.Units.gridUnit * 18, Math.min(mainWindow.width * 0.5, maxW + Kirigami.Units.gridUnit * 10));
+        return Math.max(Kirigami.Units.gridUnit * 18, Math.min(Kirigami.Units.gridUnit * 40, maxW + Kirigami.Units.gridUnit * 10));
     }
     
     // Helper to calculate total sizes
@@ -99,23 +101,74 @@ Rectangle {
             anchors.fill: parent
             spacing: Kirigami.Units.smallSpacing
             
-            Kirigami.Heading {
-                text: UIStrings.ui.corpse_cleaner.results_title
-                level: 2
-                font.pointSize: UIFonts.fonts.headline
+        // ── Search, Action and Filters ───────────────────────────────────────
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Kirigami.Units.smallSpacing
+
+            Kirigami.SearchField {
+                id: corpseSearchField
                 Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-                visible: false // Removed headline as requested
+                placeholderText: "Search corpses..."
+                enabled: paneRoot.activeTask && paneRoot.activeTask.state === 2
             }
 
-            Kirigami.Separator { Layout.fillWidth: true; opacity: 0.5; visible: false }
+            Button {
+                id: sortBtn
+                text: "Sort"
+                icon.name: "view-sort-ascending"
+                enabled: paneRoot.activeTask && paneRoot.activeTask.state === 2
+                onClicked: sortMenu.opened ? sortMenu.close() : sortMenu.open()
+
+                Menu {
+                    id: sortMenu
+                    y: sortBtn.height
+
+                    ActionGroup { id: corpseSortGroup; exclusive: true }
+
+                    RadioDelegate {
+                        text: "Name (A \u2192 Z)"
+                        ActionGroup.group: corpseSortGroup
+                        onClicked: { if(paneRoot.activeTask) paneRoot.activeTask.set_sort_order("name_asc"); sortMenu.close() }
+                    }
+                    RadioDelegate {
+                        text: "Name (Z \u2192 A)"
+                        ActionGroup.group: corpseSortGroup
+                        onClicked: { if(paneRoot.activeTask) paneRoot.activeTask.set_sort_order("name_desc"); sortMenu.close() }
+                    }
+                    MenuSeparator {}
+                    RadioDelegate {
+                        text: "Size (Small \u2192 Large)"
+                        ActionGroup.group: corpseSortGroup
+                        onClicked: { if(paneRoot.activeTask) paneRoot.activeTask.set_sort_order("size_asc"); sortMenu.close() }
+                    }
+                    RadioDelegate {
+                        text: "Size (Large \u2192 Small)"
+                        ActionGroup.group: corpseSortGroup
+                        onClicked: { if(paneRoot.activeTask) paneRoot.activeTask.set_sort_order("size_desc"); sortMenu.close() }
+                    }
+                }
+            }
+
+            Button {
+                id: scanBtn
+                text: UIStrings.ui.corpse_cleaner.btn_scan
+                icon.name: "search"
+                enabled: paneRoot.activeTask && paneRoot.activeTask.state !== 1
+                onClicked: {
+                    if (paneRoot.activeTask) {
+                        paneRoot.activeTask.calculate_size()
+                    }
+                }
+            }
+        }
 
             // List Area
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 color: UIColors.theme.description_background_hex ? UIColors.theme.description_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.description_darker_multiplier)
-                border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor
+                border.color: SettingsManager.enableContrastBorders ? (UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Kirigami.Theme.highlightColor) : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
                 border.width: 0 // Removed border as requested
                 radius: Kirigami.Units.smallSpacing
                 clip: true
@@ -158,27 +211,7 @@ Rectangle {
                     // 2: Results List
                     ColumnLayout {
                         spacing: 0
-                        
-                        TextField {
-                            id: corpseSearchField
-                            Layout.fillWidth: true
-                            Layout.margins: Kirigami.Units.smallSpacing
-                            placeholderText: "Search corpses..."
-                            
-                            rightPadding: corpseClearBtn.width + Kirigami.Units.smallSpacing
-                            ToolButton {
-                                id: corpseClearBtn
-                                implicitWidth: Kirigami.Units.gridUnit * 1.5
-                                implicitHeight: Kirigami.Units.gridUnit * 1.5
-                                icon.name: "edit-clear"
-                                visible: corpseSearchField.text.length > 0
-                                anchors.right: parent.right
-                                anchors.verticalCenter: parent.verticalCenter
-                                onClicked: corpseSearchField.text = ""
-                            }
-                        }
-                        
-                        Kirigami.Separator { Layout.fillWidth: true; opacity: 0.5; visible: corpseSearchField.visible }
+                    
 
                         RowLayout {
                             Layout.fillWidth: true
@@ -204,7 +237,7 @@ Rectangle {
                                 height: visible ? implicitHeight : 0
                                 
                                 background: Rectangle {
-                                    color: del.hovered ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.1) : "transparent"
+                                    color: del.hovered ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.1) : "transparent"
                                 }
 
                                 contentItem: ColumnLayout {
@@ -281,24 +314,46 @@ Rectangle {
             Label {
                 text: paneRoot.getSelectedTotal() ? UIStrings.ui.corpse_cleaner.total_selected + paneRoot.getSelectedTotal() : ""
                 font.pointSize: Kirigami.Theme.smallFont.pointSize
-                color: "#ff8c00" // Use standardize orange
+                color: SettingsManager.emphasisColor
                 Layout.alignment: Qt.AlignHCenter
                 visible: paneRoot.getSelectedCount() > 0
             }
 
             Button {
                 id: cleanBtn
-                text: UIStrings.ui.corpse_cleaner.btn_clean + " (" + paneRoot.getSelectedCount() + ")"
                 Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
                 enabled: paneRoot.getSelectedCount() > 0 && paneRoot.activeTask && paneRoot.activeTask.state !== 1
+                contentItem: Item {
+                    implicitWidth: rowClean.implicitWidth
+                    implicitHeight: rowClean.implicitHeight
+                    Row {
+                        id: rowClean
+                        anchors.centerIn: parent
+                        spacing: Kirigami.Units.smallSpacing
+                        Kirigami.Icon {
+                            source: UIIcons.icons.delete || ""
+                            width: Kirigami.Units.iconSizes.smallMedium
+                            height: Kirigami.Units.iconSizes.smallMedium
+                            anchors.verticalCenter: parent.verticalCenter
+                            isMask: true
+                            color: UIIcons.iconColor("delete", cleanBtn.enabled ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.disabledTextColor)
+                        }
+                        Label {
+                            text: UIStrings.ui.corpse_cleaner.btn_clean + " (" + paneRoot.getSelectedCount() + ")"
+                            color: cleanBtn.enabled ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.disabledTextColor
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                }
                 onClicked: {
                     let items = paneRoot.getSelectedItems();
                     mainWindow.openCorpseCleanerConfirmation(paneRoot.activeTask, items, paneRoot.getSelectedTotal());
                 }
                 background: Rectangle {
-                    color: cleanBtn.down ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.2) : 
-                           cleanBtn.hovered ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.1) : "transparent"
-                    border.color: Kirigami.Theme.highlightColor
+                    color: cleanBtn.down ? Qt.rgba(Kirigami.Theme.negativeTextColor.r, Kirigami.Theme.negativeTextColor.g, Kirigami.Theme.negativeTextColor.b, 0.2) :
+                           cleanBtn.hovered ? Qt.rgba(Kirigami.Theme.negativeTextColor.r, Kirigami.Theme.negativeTextColor.g, Kirigami.Theme.negativeTextColor.b, 0.1) : "transparent"
+                    border.color: Kirigami.Theme.negativeTextColor
                     border.width: 1
                     radius: Kirigami.Units.smallSpacing
                 }

@@ -20,9 +20,6 @@ class SidebarModel(QAbstractListModel):
         self._filtered_items = []
         
         self.load_config()
-        
-        if self._settings_manager:
-            self._settings_manager.developerModeChanged.connect(self._rebuild_list)
 
     def load_config(self):
         if not os.path.exists(self._config_path):
@@ -54,16 +51,10 @@ class SidebarModel(QAbstractListModel):
         self._rebuild_list()
 
     def _rebuild_list(self):
-        show_hidden = False
-        if self._settings_manager:
-            # We are using developerMode to toggle hidden tasks
-            show_hidden = self._settings_manager.developerMode
-            
         self.beginResetModel()
         self._filtered_items = []
         for item in self._all_items:
-            # Filter if hidden is true and show_hidden is false
-            if item.get("hidden", False) and not show_hidden:
+            if item.get("hidden", False):
                 continue
             self._filtered_items.append(item)
         self.endResetModel()

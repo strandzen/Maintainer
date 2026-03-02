@@ -4,7 +4,6 @@ from PyQt6.QtCore import QObject, QAbstractListModel, Qt, pyqtProperty, pyqtSlot
 
 from models.task_model import TaskModel
 from tasks.command_task import CommandTask
-from tasks.efi_boot_task import EfiBootTask
 
 RECOMMENDED_CATEGORIES = ("clean_system", "maintain_system")
 
@@ -61,7 +60,6 @@ class TaskRegistry(QObject):
         
         if self._settings_manager is not None:
             self._settings_manager.favoriteTasksChanged.connect(self._rebuild_favorites_model)
-            self._settings_manager.developerModeChanged.connect(self._rebuild_all_models)
             self._rebuild_all_models()
         else:
             self._rebuild_all_models()
@@ -114,15 +112,11 @@ class TaskRegistry(QObject):
         self._all_tasks.clear()
         for model in self._task_models.values():
             model.clear()
-        
-        show_sim = False
-        if self._settings_manager:
-            show_sim = self._settings_manager.developerMode
 
         for category in self._category_data:
             cat_id = category.get("id")
             cat_hidden = category.get("hidden", False)
-            if cat_hidden and not show_sim:
+            if cat_hidden:
                 continue
             if cat_id not in self._task_models:
                 self._task_models[cat_id] = TaskModel(parent=self.parent())
@@ -131,7 +125,7 @@ class TaskRegistry(QObject):
             model.clear()
             
             for task_data in category.get("tasks", []):
-                if not show_sim and task_data.get("name") == "Simulation Test":
+                if task_data.get("name") == "Simulation Test":
                     continue
                 
                 task_type = task_data.get("type", "command")
@@ -156,15 +150,6 @@ class TaskRegistry(QObject):
                         is_advanced=task_data.get("is_advanced", False),
                         requires_privilege=task_data.get("requires_privilege", False),
                         settings=self._settings_manager,
-                        parent=self.parent()
-                    )
-                elif task_type == "efi_audit":
-                    task = EfiBootTask(
-                        name=task_data["name"],
-                        description=task_data["description"],
-                        is_recommended=task_data.get("is_recommended", False),
-                        is_advanced=task_data.get("is_advanced", True),
-                        requires_privilege=task_data.get("requires_privilege", True),
                         parent=self.parent()
                     )
                 else:

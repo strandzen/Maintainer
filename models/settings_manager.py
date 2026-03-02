@@ -7,12 +7,18 @@ class SettingsManager(QObject):
     journalLogAgeChanged = pyqtSignal()
     ghostConfigBlacklistChanged = pyqtSignal()
     favoriteTasksChanged = pyqtSignal()
-    developerModeChanged = pyqtSignal()
     corpseCleanerCustomPathsChanged = pyqtSignal()
     scriptsDirChanged = pyqtSignal()
     aurHelperChanged = pyqtSignal()
     checkUpdatesOnStartupChanged = pyqtSignal()
     confirmPackageRemovalChanged = pyqtSignal()
+    emphasisColorChanged = pyqtSignal()
+    cpuColorChanged = pyqtSignal()
+    memoryColorChanged = pyqtSignal()
+    downloadColorChanged = pyqtSignal()
+    uploadColorChanged = pyqtSignal()
+    swapColorChanged = pyqtSignal()
+    enableContrastBordersChanged = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -29,8 +35,6 @@ class SettingsManager(QObject):
             self.settings.setValue("ghostConfigBlacklist", "obs-studio,kde,plasma")
         if not self.settings.contains("favoriteTasks"):
             self.settings.setValue("favoriteTasks", ["Clear Pacman Cache"])
-        if not self.settings.contains("developerMode"):
-            self.settings.setValue("developerMode", False)
         if not self.settings.contains("corpseCleanerCustomPaths"):
             self.settings.setValue("corpseCleanerCustomPaths", "")
         if not self.settings.contains("scriptsDir"):
@@ -42,6 +46,13 @@ class SettingsManager(QObject):
             self.settings.setValue("checkUpdatesOnStartup", True)
         if not self.settings.contains("confirmPackageRemoval"):
             self.settings.setValue("confirmPackageRemoval", True)
+        if not self.settings.contains("enableContrastBorders"):
+            self.settings.setValue("enableContrastBorders", True)
+        if not self.settings.contains("emphasisColor"):
+            self.settings.setValue("emphasisColor", "#ff8c00")
+        for key in ("cpuColor", "memoryColor", "downloadColor", "uploadColor", "swapColor"):
+            if not self.settings.contains(key):
+                self.settings.setValue(key, "")
 
     @pyqtProperty(int, notify=cornerRadiusChanged)
     def cornerRadius(self):
@@ -98,19 +109,6 @@ class SettingsManager(QObject):
         if self.favoriteTasks != value:
             self.settings.setValue("favoriteTasks", value)
             self.favoriteTasksChanged.emit()
-
-    @pyqtProperty(bool, notify=developerModeChanged)
-    def developerMode(self):
-        val = self.settings.value("developerMode", False)
-        if isinstance(val, str):
-            return val.lower() == 'true'
-        return bool(val)
-
-    @developerMode.setter
-    def developerMode(self, value):
-        if self.developerMode != value:
-            self.settings.setValue("developerMode", bool(value))
-            self.developerModeChanged.emit()
 
     @pyqtProperty(str, notify=corpseCleanerCustomPathsChanged)
     def corpseCleanerCustomPaths(self):
@@ -173,3 +171,73 @@ class SettingsManager(QObject):
         if self.confirmPackageRemoval != value:
             self.settings.setValue("confirmPackageRemoval", bool(value))
             self.confirmPackageRemovalChanged.emit()
+
+    @pyqtProperty(bool, notify=enableContrastBordersChanged)
+    def enableContrastBorders(self):
+        return bool(self.settings.value("enableContrastBorders", True, type=bool))
+
+    @enableContrastBorders.setter
+    def enableContrastBorders(self, value):
+        if self.enableContrastBorders != value:
+            self.settings.setValue("enableContrastBorders", bool(value))
+            self.enableContrastBordersChanged.emit()
+
+    @pyqtProperty(str, notify=emphasisColorChanged)
+    def emphasisColor(self):
+        return str(self.settings.value("emphasisColor", "#ff8c00"))
+
+    @emphasisColor.setter
+    def emphasisColor(self, value):
+        if self.emphasisColor != value:
+            self.settings.setValue("emphasisColor", str(value))
+            self.emphasisColorChanged.emit()
+
+    @pyqtProperty(str, notify=cpuColorChanged)
+    def cpuColor(self):
+        return str(self.settings.value("cpuColor", ""))
+
+    @cpuColor.setter
+    def cpuColor(self, value):
+        if self.cpuColor != value:
+            self.settings.setValue("cpuColor", str(value))
+            self.cpuColorChanged.emit()
+
+    @pyqtProperty(str, notify=memoryColorChanged)
+    def memoryColor(self):
+        return str(self.settings.value("memoryColor", ""))
+
+    @memoryColor.setter
+    def memoryColor(self, value):
+        if self.memoryColor != value:
+            self.settings.setValue("memoryColor", str(value))
+            self.memoryColorChanged.emit()
+
+    @pyqtProperty(str, notify=downloadColorChanged)
+    def downloadColor(self):
+        return str(self.settings.value("downloadColor", ""))
+
+    @downloadColor.setter
+    def downloadColor(self, value):
+        if self.downloadColor != value:
+            self.settings.setValue("downloadColor", str(value))
+            self.downloadColorChanged.emit()
+
+    @pyqtProperty(str, notify=uploadColorChanged)
+    def uploadColor(self):
+        return str(self.settings.value("uploadColor", ""))
+
+    @uploadColor.setter
+    def uploadColor(self, value):
+        if self.uploadColor != value:
+            self.settings.setValue("uploadColor", str(value))
+            self.uploadColorChanged.emit()
+
+    @pyqtProperty(str, notify=swapColorChanged)
+    def swapColor(self):
+        return str(self.settings.value("swapColor", ""))
+
+    @swapColor.setter
+    def swapColor(self, value):
+        if self.swapColor != value:
+            self.settings.setValue("swapColor", str(value))
+            self.swapColorChanged.emit()

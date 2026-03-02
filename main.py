@@ -1,5 +1,6 @@
 import sys
 import os
+import subprocess
 from PyQt6.QtGui import QGuiApplication, QIcon
 from PyQt6.QtQml import QQmlApplicationEngine
 from PyQt6.QtCore import Qt, QUrl, QCoreApplication
@@ -27,7 +28,26 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
+def launch_terminal(command):
+    """Try various terminal emulators to run the given command."""
+    # We add a read at the end so the user can see the output before the window closes
+    full_cmd = f"{command}; echo; echo '------------------------------------------'; echo 'Task complete. Press Enter to close this window...'; read"
+    term_configs = [
+        ["konsole", "-e", "bash", "-c", full_cmd],
+        ["gnome-terminal", "--", "bash", "-c", full_cmd],
+        ["xfce4-terminal", "-e", "bash", "-c", full_cmd],
+        ["xterm", "-e", "bash", "-c", full_cmd],
+    ]
+    for cmd_list in term_configs:
+        try:
+            subprocess.Popen(cmd_list)
+            return True
+        except Exception:
+            continue
+    return False
+
 def main():
+    print("🚀 MAINTAINER APP STARTING - DEBUG VERSION 2.0.1 (Markers Fix)")
     # Force KDE Plasma style for Qt Quick Controls
     os.environ["QT_QUICK_CONTROLS_STYLE"] = "org.kde.desktop"
     
@@ -35,7 +55,7 @@ def main():
     system_plugin_path = "/usr/lib/qt6/plugins"
     if os.path.exists(system_plugin_path):
         QCoreApplication.addLibraryPath(system_plugin_path)
-
+    
     # Set up the application
     QGuiApplication.setDesktopSettingsAware(True)
     app = QGuiApplication(sys.argv)
@@ -79,6 +99,10 @@ def main():
 
     # Initialize Package Manager
     package_manager = PackageManager(settings_manager=settings_manager, parent=app)
+    
+    # CONNECT TERMINAL POPUP SIGNAL
+    package_manager.upgradeActionTriggered.connect(launch_terminal)
+
     package_manager.refresh()
     if settings_manager.checkUpdatesOnStartup:
         package_manager.check_updates()
