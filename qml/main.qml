@@ -12,6 +12,8 @@ ApplicationWindow {
     visible: true
     title: UIStrings.ui.main.title
 
+    Kirigami.Theme.inherit: true
+    Kirigami.Theme.colorSet: Kirigami.Theme.Window
 
     color: UIColors.theme.window_background_hex ? UIColors.theme.window_background_hex : Qt.darker(Kirigami.Theme.backgroundColor, UIColors.theme.window_darker_multiplier) // Darker window background to pop panels
 

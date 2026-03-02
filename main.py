@@ -2,7 +2,7 @@ import sys
 import os
 from PyQt6.QtGui import QGuiApplication, QIcon
 from PyQt6.QtQml import QQmlApplicationEngine
-from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtCore import Qt, QUrl, QCoreApplication
 
 from models.system_health import SystemHealth
 from models.task_engine import TaskEngine
@@ -28,8 +28,18 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 def main():
+    # Force KDE Plasma style for Qt Quick Controls
+    os.environ["QT_QUICK_CONTROLS_STYLE"] = "org.kde.desktop"
+    
+    # Inject system Qt plugin path to allow loading of host platform themes (e.g., KDE Plasma)
+    system_plugin_path = "/usr/lib/qt6/plugins"
+    if os.path.exists(system_plugin_path):
+        QCoreApplication.addLibraryPath(system_plugin_path)
+
     # Set up the application
+    QGuiApplication.setDesktopSettingsAware(True)
     app = QGuiApplication(sys.argv)
+    
     app.setApplicationName("Maintainer")
     app.setApplicationDisplayName("Maintainer Project")
     
@@ -75,6 +85,15 @@ def main():
 
     # Setup QML Engine
     engine = QQmlApplicationEngine()
+    
+    # Add system QML path for plugins (like org.kde.desktop style)
+    system_qml_path = "/usr/lib/qt6/qml"
+    if os.path.exists(system_qml_path):
+        engine.addImportPath(system_qml_path)
+        
+    # Add bundle path to QML import paths for PyInstaller
+    bundle_path = resource_path(".")
+    engine.addImportPath(bundle_path)
     
     # Expose Python objects to QML context
     context = engine.rootContext()
