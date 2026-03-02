@@ -191,42 +191,31 @@ Kirigami.Page {
                                 }
                             }
 
-                            ProgressBar {
+                            Rectangle {
+                                id: swapFrame
                                 Layout.fillWidth: true
-                                value: SystemHealth.swapUsage
+                                Layout.preferredHeight: Kirigami.Units.gridUnit
+                                radius: SettingsManager.cornerRadius
+                                color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.1)
+                                border.color: UIColors.theme.border_color_hex ? UIColors.theme.border_color_hex : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+                                border.width: 1
 
-                                background: Rectangle {
-                                    implicitHeight: Kirigami.Units.mediumSpacing
-                                    color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.1)
-                                    radius: Kirigami.Units.smallSpacing
-                                }
-                                contentItem: Item {
-                                    implicitHeight: Kirigami.Units.mediumSpacing
-                                    Rectangle {
-                                        width: parent.parent.visualPosition * parent.width
-                                        height: parent.height
-                                        radius: Kirigami.Units.smallSpacing
-                                        color: Kirigami.Theme.neutralTextColor
-                                    }
-                                }
-                            }
-
-                            // IPv4
-                            RowLayout {
-                                Layout.fillWidth: true
-                                Layout.topMargin: Kirigami.Units.smallSpacing
-                                Label {
-                                    text: UIStrings.ui.monitor.ipv4
-                                    color: UIColors.theme.neutral_text_hex || Kirigami.Theme.neutralTextColor
-                                }
-                                Item { Layout.fillWidth: true }
-                                Label {
-                                    text: SystemHealth.ipv4Address
-                                    color: Kirigami.Theme.highlightColor
+                                Kirigami.ShadowedRectangle {
+                                    height: parent.height
+                                    width: parent.width * SystemHealth.swapUsage
+                                    color: Kirigami.Theme.neutralTextColor
+                                    visible: width > 0
+                                    corners.topLeftRadius: swapFrame.radius
+                                    corners.bottomLeftRadius: swapFrame.radius
+                                    corners.topRightRadius: swapFrame.radius
+                                    corners.bottomRightRadius: swapFrame.radius
                                 }
                             }
                         }
                     }
+
+                    // Spacer to push items to the top
+                    Item { Layout.fillHeight: true }
                 }
             }
 
