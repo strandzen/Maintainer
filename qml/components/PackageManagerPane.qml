@@ -324,7 +324,7 @@ Rectangle {
 
                             // Highlight updates
                             Kirigami.Icon {
-                                source: UIIcons.icons.package_update_available || ""
+                                source: Qt.resolvedUrl("../../icons/package_update_available.svg")
                                 visible: model.updateStatus === "available"
                                 isMask: true
                                 Layout.preferredWidth: Kirigami.Units.iconSizes.small
