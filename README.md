@@ -1,9 +1,9 @@
 # Maintainer
+## AI Disclaimer
 
-**Maintainer** is a premium, modern system maintenance utility for Linux, specifically designed to integrate seamlessly with the KDE Plasma desktop environment. Built using Python, PyQt6, and the Kirigami UI framework, it provides a powerful yet intuitive interface for keeping your system clean, updated, and healthy.
+**Disclaimer**: Artificial Intelligence (AI) was utilized in the creation, coding, and design of this project.
 
-![Maintainer Screenshot](icons/app_icon.svg)
-
+**Maintainer** is a system maintenance utility for Linux, specifically designed to integrate with the KDE Plasma desktop environment. "Built" using Python, PyQt6, and the Kirigami UI framework, it provides a powerful yet intuitive interface for keeping your system clean, updated, and in good condition.
 ## Screenshots
 
 <details>
@@ -19,12 +19,12 @@
 
 - 🚀 **System Health Dashboard**: Accurate, real-time metrics for CPU, Memory, Network traffic, Swap usage, and detailed Storage distribution.
 - 📦 **Native Package Manager**: Comprehensive interface for Arch Linux package management, supporting popular AUR helpers like `paru` and `yay`.
-- 💎 **AppImage Hub**: A centralized manager to browse, download, launch, and update AppImages with integrated version tracking and GitHub release checking.
+- 🎁 **AppImage Hub**: A centralized manager to browse, download, launch, and update AppImages with integrated version tracking and GitHub release checking.
 - 🧹 **Corpse Cleaner**: Intelligent identification and deep scanning for orphaned configuration files, cache directories, and system "dead weight" from uninstalled software.
 - 🗑️ **Clean System Files**: Safely remove standard package caches, clear old system logs, and purge orphaned dependencies to reclaim valuable disk space.
-- 📜 **Custom Scripts**: Execute your own custom bash scripts safely through the Maintainer UI, complete with live terminal output.
-- 🔐 **EFI Boot Audit**: Advanced low-level tooling to interactively audit and manage EFI boot entries safely.
-- 🖌️ **Native Desktop Integration**: Perfect alignment with KDE Plasma's UI guidelines, matching global corner radius, icons, colors, and transparent Kirigami components.
+- 📜 **Custom Scripts**: Execute your own custom bash scripts safely through a GUI, complete with live terminal output.
+- 🔐 **EFI Boot Audit**: Advanced low-level tooling to audit and manage EFI boot entries.
+- 🖌️ **Native Desktop Integration**: Perfect alignment with KDE Plasma's UI guidelines, matching global corner radius, colors, UI elements. Tested with [KDE Material You Colors](https://github.com/luisbocanegra/kde-material-you-colors) . 
 
 ## Architecture
 
@@ -72,12 +72,9 @@ Maintainer can be bundled into a single standalone executable using PyInstaller.
 
 ## Credits & Acknowledgements
 
-- **Icons**: Designed by [Dazzle UI](https://dazzleui.com/).
+- **Icons**: Sourced from [Dazzle UI](https://dazzleui.com/).
 - **AppImages**: Sourced from the [AppImageHub GitHub repository](https://github.com/AppImage/appimage.github.io).
 
-## AI Disclaimer
-
-**Disclaimer**: Artificial Intelligence (AI) was utilized in the creation, coding, and design of this project.
 
 ## License
 
