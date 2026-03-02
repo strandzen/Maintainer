@@ -11,9 +11,17 @@ The goal was to create a one stop shop/hub for all "scary" Linux terminal comman
 <details>
 <summary>Click to expand screenshots</summary>
 
-![Screenshot 1](screenshots/Screenshot_20260302_191243.png)
-![Screenshot 2](screenshots/Screenshot_20260302_191317.png)
-![Screenshot 3](screenshots/Screenshot_20260302_191332.png)
+![Monitor](screenshots/monitor.png)
+![Manage locally installed AppImages](screenshots/appimages_manage.png)
+![Download AppImages](screenshots/appimages_browse.png)
+![Cleaner](screenshots/clean.png)
+![Corpse Config Cleaner](screenshots/corpse.png)
+![Manage Packages](screenshots/packages_manage.png)
+![Manage Dependencies](screenshots/packages_dependencies.png)
+![Browse Packages with filters](screenshots/packages_filters.png)
+![Browse Packages](screenshots/packages_browse.png)
+![Download AppImages](screenshots/appimages_browse.png)
+![Settings](screenshots/settings.png)
 
 </details>
 
