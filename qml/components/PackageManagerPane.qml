@@ -322,24 +322,6 @@ Rectangle {
                                 Layout.alignment: Qt.AlignVCenter
                             }
 
-                            // Favorite Star
-                            Kirigami.Icon {
-                                source: Qt.resolvedUrl("../../icons/star.svg")
-                                visible: model.isFavorite
-                                isMask: true
-                                Layout.preferredWidth: Kirigami.Units.iconSizes.small
-                                Layout.preferredHeight: Kirigami.Units.iconSizes.small
-                                Layout.alignment: Qt.AlignVCenter
-                                color: Kirigami.Theme.highlightColor
-                            }
-
-                            // Placeholder for Favorite Star
-                            Item {
-                                visible: !model.isFavorite
-                                Layout.preferredWidth: Kirigami.Units.iconSizes.small
-                                Layout.preferredHeight: Kirigami.Units.iconSizes.small
-                            }
-
                             // Highlight updates
                             Kirigami.Icon {
                                 source: UIIcons.icons.package_update_available || ""
@@ -348,7 +330,7 @@ Rectangle {
                                 Layout.preferredWidth: Kirigami.Units.iconSizes.small
                                 Layout.preferredHeight: Kirigami.Units.iconSizes.small
                                 Layout.alignment: Qt.AlignVCenter
-                                color: Kirigami.Theme.highlightColor
+                                color: Kirigami.Theme.positiveTextColor
 
                                 HoverHandler { id: updateAvailableHover }
                                 ToolTip.text: (model.repo === "AUR" || model.repo === "") ? "View PKGBUILD" : "Update Available"
@@ -367,9 +349,27 @@ Rectangle {
                                 }
                             }
 
-                            // Placeholder to keep alignment
+                            // Placeholder to keep alignment for updates
                             Item {
                                 visible: model.updateStatus !== "available"
+                                Layout.preferredWidth: Kirigami.Units.iconSizes.small
+                                Layout.preferredHeight: Kirigami.Units.iconSizes.small
+                            }
+
+                            // Favorite Star
+                            Kirigami.Icon {
+                                source: Qt.resolvedUrl("../../icons/star.svg")
+                                visible: model.isFavorite
+                                isMask: true
+                                Layout.preferredWidth: Kirigami.Units.iconSizes.small
+                                Layout.preferredHeight: Kirigami.Units.iconSizes.small
+                                Layout.alignment: Qt.AlignVCenter
+                                color: Kirigami.Theme.highlightColor
+                            }
+
+                            // Placeholder for Favorite Star
+                            Item {
+                                visible: !model.isFavorite
                                 Layout.preferredWidth: Kirigami.Units.iconSizes.small
                                 Layout.preferredHeight: Kirigami.Units.iconSizes.small
                             }
@@ -379,7 +379,7 @@ Rectangle {
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
                                 font.weight: paneRoot.isSelected(model.fullName) ? Font.Bold : Font.Normal
-                                color: model.updateStatus === "available" ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                                color: model.updateStatus === "available" ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.textColor
                             }
 
                             Label {
