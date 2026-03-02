@@ -69,8 +69,8 @@ Item {
                         anchors.fill: parent; 
                         hoverEnabled: true
                         ToolTip.visible: containsMouse
-                        ToolTip.text: "Packages: " + formatBytes(root.appsSize)
-                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                        ToolTip.delay: 500
+                        ToolTip.text: formatBytes(root.appsSize)
                     }
                 }
                 // Games
@@ -83,8 +83,8 @@ Item {
                         anchors.fill: parent; 
                         hoverEnabled: true
                         ToolTip.visible: containsMouse
-                        ToolTip.text: "Games: " + formatBytes(root.gamesSize)
-                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                        ToolTip.delay: 500
+                        ToolTip.text: formatBytes(root.gamesSize)
                     }
                 }
                 // Media
@@ -97,8 +97,8 @@ Item {
                         anchors.fill: parent; 
                         hoverEnabled: true
                         ToolTip.visible: containsMouse
-                        ToolTip.text: "Media: " + formatBytes(root.mediaSize)
-                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                        ToolTip.delay: 500
+                        ToolTip.text: formatBytes(root.mediaSize)
                     }
                 }
                 // Downloads
@@ -111,8 +111,8 @@ Item {
                         anchors.fill: parent; 
                         hoverEnabled: true
                         ToolTip.visible: containsMouse
-                        ToolTip.text: "Downloads: " + formatBytes(root.downloadsSize)
-                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                        ToolTip.delay: 500
+                        ToolTip.text: formatBytes(root.downloadsSize)
                     }
                 }
                 // VMs
@@ -125,8 +125,8 @@ Item {
                         anchors.fill: parent; 
                         hoverEnabled: true
                         ToolTip.visible: containsMouse
-                        ToolTip.text: "VMs: " + formatBytes(root.vmsSize)
-                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                        ToolTip.delay: 500
+                        ToolTip.text: formatBytes(root.vmsSize)
                     }
                 }
                 // Cache/Trash
@@ -139,8 +139,8 @@ Item {
                         anchors.fill: parent; 
                         hoverEnabled: true
                         ToolTip.visible: containsMouse
-                        ToolTip.text: "Cache & Trash: " + formatBytes(root.trashCacheSize)
-                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                        ToolTip.delay: 500
+                        ToolTip.text: formatBytes(root.trashCacheSize)
                     }
                 }
                 // System
@@ -153,8 +153,8 @@ Item {
                         anchors.fill: parent; 
                         hoverEnabled: true
                         ToolTip.visible: containsMouse
-                        ToolTip.text: "System: " + formatBytes(root.otherSize)
-                        ToolTip.delay: Kirigami.Units.toolTipDelay
+                        ToolTip.delay: 500
+                        ToolTip.text: formatBytes(root.otherSize)
                     }
                 }
             }
