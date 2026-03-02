@@ -421,6 +421,7 @@ Rectangle {
         Button {
             text: UIStrings.ui.landing.run_recommended
             Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
             visible: isReady && isHomeActive && selectedCount === 0
             icon.name: "media-playback-start"
             onClicked: {
@@ -462,6 +463,7 @@ Rectangle {
         Button {
             id: runSelectedBtn
             Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
             visible: isReady && selectedCount > 0
             onClicked: {
                 if (activeTaskModel) {

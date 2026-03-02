@@ -230,12 +230,15 @@ Rectangle {
                                             urlDialog.urlFieldText = paneRoot.currentUpdateUrl;
                                             urlDialog.open();
                                         }
-                                        contentItem: Kirigami.Icon {
-                                            source: UIIcons.icons.url || ""
-                                            implicitWidth: Kirigami.Units.iconSizes.smallMedium
-                                            implicitHeight: Kirigami.Units.iconSizes.smallMedium
-                                            isMask: true
-                                            color: (model.updateUrl && model.updateUrl !== "") ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                                        contentItem: Item {
+                                            Kirigami.Icon {
+                                                anchors.centerIn: parent
+                                                width: Kirigami.Units.iconSizes.smallMedium
+                                                height: Kirigami.Units.iconSizes.smallMedium
+                                                source: UIIcons.icons.url || ""
+                                                isMask: true
+                                                color: (model.updateUrl && model.updateUrl !== "") ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                                            }
                                         }
                                     }
 
