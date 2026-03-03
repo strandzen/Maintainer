@@ -20,7 +20,6 @@ The goal was to create a one stop shop/hub for all "scary" Linux terminal comman
 ![Manage Dependencies](screenshots/packages_dependencies.png)
 ![Browse Packages with filters](screenshots/packages_filters.png)
 ![Browse Packages](screenshots/packages_browse.png)
-![Download AppImages](screenshots/appimages_browse.png)
 ![Settings](screenshots/settings.png)
 
 </details>
