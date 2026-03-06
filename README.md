@@ -1,11 +1,12 @@
-# Maintainer
 ## AI Disclaimer
 
 **Disclaimer**: Artificial Intelligence (AI) was utilized in the creation, coding, and design of this project.
 
+# Maintainer
+
 **Maintainer** is a system maintenance utility for Linux, specifically designed to integrate with the KDE Plasma desktop environment, tested on CachyOS with Plasma 6.6. "Built" using Python, PyQt6, and the Kirigami UI framework, it provides a powerful interface for keeping your system clean, updated, and in good condition. 
 
-The goal was to create a one stop shop/hub for all "scary" Linux terminal commands and etc. I wanted to create an app a theoretical elderly could understand. 
+The goal was to create a AppImages and Packages (pacman) discovery/management hub, but also managing "scary" Linux terminal commands that may deter more casual users. 
 ## Screenshots
 
 <details>
