@@ -33,7 +33,7 @@ The goal was to create a AppImages and Packages (pacman) discovery/management hu
 - 🧹 **Corpse Cleaner**: Intelligent identification and deep scanning for orphaned configuration files, cache directories, and system "dead weight" from uninstalled software.
 - 🗑️ **Clean System Files**: Safely remove standard package caches, clear old system logs, and purge orphaned dependencies to reclaim valuable disk space.
 - 📜 **Custom Scripts**: Execute your own custom bash scripts safely through a GUI, complete with live terminal output.
-- 🖌️ **Native Desktop Integration**: Perfect alignment with KDE Plasma's UI guidelines, matching global corner radius, colors, UI elements. Tested with [KDE Material You Colors](https://github.com/luisbocanegra/kde-material-you-colors) . 
+- 🖌️ **Native Desktop Integration**: Inherits colors directly from Plasma, adjustable colors and radii. Tested with [KDE Material You Colors](https://github.com/luisbocanegra/kde-material-you-colors) . 
 
 ## Architecture
 
