@@ -450,6 +450,7 @@ Kirigami.Page {
                                 Kirigami.Separator {
                                     Layout.fillWidth: true
                                     opacity: 0.2
+                                    visible: !SettingsManager.alternatingRowColors
                                 }
                             }
                         }

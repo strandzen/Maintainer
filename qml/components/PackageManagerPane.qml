@@ -441,6 +441,7 @@ Rectangle {
                             anchors.rightMargin: Kirigami.Units.largeSpacing
                             anchors.verticalCenter: parent.verticalCenter
                             opacity: 0.5
+                            visible: !SettingsManager.alternatingRowColors
                         }
 
                         MouseArea {

@@ -285,7 +285,7 @@ Rectangle {
                                 Layout.rightMargin: Kirigami.Units.largeSpacing
                                 spacing: Kirigami.Units.smallSpacing
 
-                                Kirigami.Separator { Layout.fillWidth: true; opacity: 0.3 }
+                                Kirigami.Separator { Layout.fillWidth: true; opacity: 0.3; visible: !SettingsManager.alternatingRowColors }
 
                                 RowLayout {
                                     Layout.fillWidth: true

@@ -249,6 +249,7 @@ Rectangle {
                             Kirigami.Separator {
                                 Layout.fillWidth: true
                                 opacity: 0.3
+                                visible: !SettingsManager.alternatingRowColors
                             }
                         }
                         onClicked: {
@@ -362,6 +363,7 @@ Rectangle {
                             Kirigami.Separator {
                                 Layout.fillWidth: true
                                 opacity: 0.3
+                                visible: !SettingsManager.alternatingRowColors
                             }
                         }
                     }
