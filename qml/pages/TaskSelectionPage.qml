@@ -5,7 +5,6 @@ import org.kde.kirigami as Kirigami
 
 Kirigami.ScrollablePage {
     id: page
-    background: null
     
     // Properties that can be set when this page is pushed/replaced
     property string pageTitle: "Main Task"

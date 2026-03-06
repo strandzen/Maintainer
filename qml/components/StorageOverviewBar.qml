@@ -8,7 +8,22 @@ Item {
     implicitHeight: layout.implicitHeight + Kirigami.Units.smallSpacing * 2
     implicitWidth: 300
     
-    readonly property color effectiveHighlight: Kirigami.Theme.highlightColor
+    readonly property color accentColor: Kirigami.Theme.highlightColor
+
+    function _paletteColor(index) {
+        var baseHue = accentColor.hsvHue < 0 ? 0.0 : accentColor.hsvHue
+        var hue = (baseHue + index / 6.0) % 1.0
+        var sat = Math.max(0.55, accentColor.hsvSaturation)
+        var val = Math.max(0.65, Math.min(0.92, accentColor.hsvValue))
+        return Qt.hsva(hue, sat, val, 1.0)
+    }
+
+    readonly property color colorPackages:   _paletteColor(0)
+    readonly property color colorGames:      _paletteColor(1)
+    readonly property color colorMedia:      _paletteColor(2)
+    readonly property color colorDownloads:  _paletteColor(3)
+    readonly property color colorVMs:        _paletteColor(4)
+    readonly property color colorCacheTrash: _paletteColor(5)
 
     // Properties to bind from SystemHealth
     property real appsSize: 0
@@ -82,7 +97,7 @@ Item {
                 Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.appsSize / root.totalDiskSize) * parent.width : 0
-                    color: root.effectiveHighlight
+                    color: root.colorPackages
                     visible: width > 0
                     corners.topLeftRadius: isFirstVisible(0) ? barFrame.radius : 0
                     corners.bottomLeftRadius: isFirstVisible(0) ? barFrame.radius : 0
@@ -101,7 +116,7 @@ Item {
                 Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.gamesSize / root.totalDiskSize) * parent.width : 0
-                    color: "#2ecc71"
+                    color: root.colorGames
                     visible: width > 0
                     corners.topLeftRadius: isFirstVisible(1) ? barFrame.radius : 0
                     corners.bottomLeftRadius: isFirstVisible(1) ? barFrame.radius : 0
@@ -120,7 +135,7 @@ Item {
                 Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.mediaSize / root.totalDiskSize) * parent.width : 0
-                    color: "#f1c40f"
+                    color: root.colorMedia
                     visible: width > 0
                     corners.topLeftRadius: isFirstVisible(2) ? barFrame.radius : 0
                     corners.bottomLeftRadius: isFirstVisible(2) ? barFrame.radius : 0
@@ -139,7 +154,7 @@ Item {
                 Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.downloadsSize / root.totalDiskSize) * parent.width : 0
-                    color: "#3498db"
+                    color: root.colorDownloads
                     visible: width > 0
                     corners.topLeftRadius: isFirstVisible(3) ? barFrame.radius : 0
                     corners.bottomLeftRadius: isFirstVisible(3) ? barFrame.radius : 0
@@ -158,7 +173,7 @@ Item {
                 Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.vmsSize / root.totalDiskSize) * parent.width : 0
-                    color: "#9b59b6"
+                    color: root.colorVMs
                     visible: width > 0
                     corners.topLeftRadius: isFirstVisible(4) ? barFrame.radius : 0
                     corners.bottomLeftRadius: isFirstVisible(4) ? barFrame.radius : 0
@@ -177,7 +192,7 @@ Item {
                 Kirigami.ShadowedRectangle {
                     height: parent.height
                     width: root.totalDiskSize > 0 ? (root.trashCacheSize / root.totalDiskSize) * parent.width : 0
-                    color: "#e67e22"
+                    color: root.colorCacheTrash
                     visible: width > 0
                     corners.topLeftRadius: isFirstVisible(5) ? barFrame.radius : 0
                     corners.bottomLeftRadius: isFirstVisible(5) ? barFrame.radius : 0
@@ -222,37 +237,37 @@ Item {
             // Packages
             Row {
                 spacing: Kirigami.Units.smallSpacing
-                Rectangle { width: 8; height: 8; radius: 4; color: root.effectiveHighlight; anchors.verticalCenter: parent.verticalCenter }
+                Rectangle { width: 8; height: 8; radius: 4; color: root.colorPackages; anchors.verticalCenter: parent.verticalCenter }
                 Label { text: "Packages"; font.pointSize: Kirigami.Theme.smallFont.pointSize; color: Kirigami.Theme.disabledTextColor }
             }
             // Games
             Row {
                 spacing: Kirigami.Units.smallSpacing
-                Rectangle { width: 8; height: 8; radius: 4; color: "#2ecc71"; anchors.verticalCenter: parent.verticalCenter }
+                Rectangle { width: 8; height: 8; radius: 4; color: root.colorGames; anchors.verticalCenter: parent.verticalCenter }
                 Label { text: "Games"; font.pointSize: Kirigami.Theme.smallFont.pointSize; color: Kirigami.Theme.disabledTextColor }
             }
             // Media
             Row {
                 spacing: Kirigami.Units.smallSpacing
-                Rectangle { width: 8; height: 8; radius: 4; color: "#f1c40f"; anchors.verticalCenter: parent.verticalCenter }
+                Rectangle { width: 8; height: 8; radius: 4; color: root.colorMedia; anchors.verticalCenter: parent.verticalCenter }
                 Label { text: "Media"; font.pointSize: Kirigami.Theme.smallFont.pointSize; color: Kirigami.Theme.disabledTextColor }
             }
             // Downloads
             Row {
                 spacing: Kirigami.Units.smallSpacing
-                Rectangle { width: 8; height: 8; radius: 4; color: "#3498db"; anchors.verticalCenter: parent.verticalCenter }
+                Rectangle { width: 8; height: 8; radius: 4; color: root.colorDownloads; anchors.verticalCenter: parent.verticalCenter }
                 Label { text: "Downloads"; font.pointSize: Kirigami.Theme.smallFont.pointSize; color: Kirigami.Theme.disabledTextColor }
             }
             // VMs
             Row {
                 spacing: Kirigami.Units.smallSpacing
-                Rectangle { width: 8; height: 8; radius: 4; color: "#9b59b6"; anchors.verticalCenter: parent.verticalCenter }
+                Rectangle { width: 8; height: 8; radius: 4; color: root.colorVMs; anchors.verticalCenter: parent.verticalCenter }
                 Label { text: "VMs"; font.pointSize: Kirigami.Theme.smallFont.pointSize; color: Kirigami.Theme.disabledTextColor }
             }
             // Cache/Trash
             Row {
                 spacing: Kirigami.Units.smallSpacing
-                Rectangle { width: 8; height: 8; radius: 4; color: "#e67e22"; anchors.verticalCenter: parent.verticalCenter }
+                Rectangle { width: 8; height: 8; radius: 4; color: root.colorCacheTrash; anchors.verticalCenter: parent.verticalCenter }
                 Label { text: "Cache / Trash"; font.pointSize: Kirigami.Theme.smallFont.pointSize; color: Kirigami.Theme.disabledTextColor }
             }
             // Other

@@ -6,7 +6,6 @@ import org.kde.kirigami as Kirigami
 Kirigami.ScrollablePage {
     id: page
     objectName: "corpseCleanerPage"
-    background: null
     title: UIStrings.ui.corpse_cleaner.title
 
     titleDelegate: Item {}

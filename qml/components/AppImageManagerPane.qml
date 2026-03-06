@@ -151,10 +151,12 @@ Rectangle {
                         property bool expanded: hovered || ListView.isCurrentItem || model.isChecked
 
                         background: Rectangle {
-                            color: model.isChecked 
+                            color: model.isChecked
                                 ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.2)
-                                : instDel.hovered 
+                                : instDel.hovered
                                 ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.08)
+                                : SettingsManager.alternatingRowColors && index % 2 !== 0
+                                ? Qt.darker(Kirigami.Theme.backgroundColor, 1.06)
                                 : "transparent"
                         }
 
@@ -204,7 +206,7 @@ Rectangle {
                                                 }
                                                 return parts.join("  ·  ")
                                             }
-                                            color: Kirigami.Theme.neutralTextColor
+                                            color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                                             font.pointSize: Kirigami.Theme.smallFont.pointSize
                                             Layout.fillWidth: true
                                             elide: Text.ElideMiddle
@@ -288,11 +290,11 @@ Rectangle {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     spacing: Kirigami.Units.largeSpacing
-                                    Label { text: "Current: " + (model.version || "Unknown"); font.pointSize: Kirigami.Theme.smallFont.pointSize; color: Kirigami.Theme.neutralTextColor }
+                                    Label { text: "Current: " + (model.version || "Unknown"); font.pointSize: Kirigami.Theme.smallFont.pointSize; color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor }
                                     Label { 
                                         text: "Latest: " + (model.latestVersion || "Unknown")
                                         font.pointSize: Kirigami.Theme.smallFont.pointSize
-                                        color: model.updateStatus === "available" ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.neutralTextColor
+                                        color: model.updateStatus === "available" ? Kirigami.Theme.positiveTextColor : (SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor)
                                         font.weight: model.updateStatus === "available" ? Font.Bold : Font.Normal
                                     }
                                     Item { Layout.fillWidth: true }
@@ -504,8 +506,10 @@ Rectangle {
                         bottomPadding: Kirigami.Units.largeSpacing
 
                         background: Rectangle {
-                            color: delegateRoot.hovered 
+                            color: delegateRoot.hovered
                                 ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.08)
+                                : SettingsManager.alternatingRowColors && index % 2 !== 0
+                                ? Qt.darker(Kirigami.Theme.backgroundColor, 1.06)
                                 : "transparent"
                         }
 
@@ -555,7 +559,7 @@ Rectangle {
                                 Label { text: delegateRoot.appName; font.weight: Font.DemiBold; Layout.fillWidth: true; elide: Text.ElideRight }
                                 Label {
                                     text: delegateRoot.expanded ? delegateRoot.appDesc : delegateRoot.appDesc.replace(/\n/g, " ")
-                                    color: Kirigami.Theme.neutralTextColor
+                                    color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                                     font.pointSize: Kirigami.Theme.smallFont.pointSize
                                     Layout.fillWidth: true
                                     wrapMode: delegateRoot.expanded ? Text.WordWrap : Text.WrapAnywhere

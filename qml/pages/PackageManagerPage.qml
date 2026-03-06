@@ -6,7 +6,6 @@ import org.kde.kirigami as Kirigami
 Kirigami.ScrollablePage {
     id: page
     objectName: "packageManagerPage"
-    background: null
     title: "Packages"
 
     titleDelegate: Item {}

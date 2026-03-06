@@ -18,9 +18,9 @@ Rectangle {
     property bool isReady: !isRunning && !isFinished
     
     // Links to Center Pane
+    property bool isHomeActive: myPageStack && myPageStack.currentItem && myPageStack.currentItem.objectName === "landingPage" ? true : false
     property var activeTaskModel: isHomeActive ? TaskRegistry.favoritesTaskModel : (myPageStack && myPageStack.currentItem ? myPageStack.currentItem.taskModel : null)
     property int selectedCount: activeTaskModel ? activeTaskModel.checkedCount : 0
-    property bool isHomeActive: myPageStack && myPageStack.currentItem && myPageStack.currentItem.objectName === "landingPage"
     
     property bool isCompact: root.width < Kirigami.Units.gridUnit * 12
     property var currentModel: activeTaskModel
@@ -62,10 +62,12 @@ Rectangle {
     }
 
     Connections {
-        target: activeTaskModel
-        function onRowsInserted() { idealWidthTimer.restart() }
-        function onRowsRemoved() { idealWidthTimer.restart() }
-        function onDataChanged() { idealWidthTimer.restart() }
+        target: root.activeTaskModel || null
+        enabled: root.activeTaskModel !== null
+        
+        function onRowsInserted(parent, first, last) { idealWidthTimer.restart() }
+        function onRowsRemoved(parent, first, last) { idealWidthTimer.restart() }
+        function onDataChanged(topLeft, bottomRight, roles) { idealWidthTimer.restart() }
     }
 
     Component.onCompleted: updateIdealWidth()
@@ -99,7 +101,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
             visible: root.isHomeActive && !isRunning && !isFinished
-            color: Kirigami.Theme.neutralTextColor
+            color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
         }
 
         Kirigami.Separator { Layout.fillWidth: true; opacity: 0.5; visible: root.isHomeActive }
@@ -135,7 +137,11 @@ Rectangle {
                         height: implicitHeight
                         
                         background: Rectangle {
-                            color: readyDelegate.hovered ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.1) : "transparent"
+                            color: readyDelegate.hovered
+                                ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.1)
+                                : SettingsManager.alternatingRowColors && index % 2 !== 0
+                                ? Qt.darker(Kirigami.Theme.backgroundColor, 1.06)
+                                : "transparent"
                         }
 
                         contentItem: ColumnLayout {
@@ -175,7 +181,7 @@ Rectangle {
                                         visible: text !== ""
                                         Layout.fillWidth: true
                                         font.pointSize: Kirigami.Theme.smallFont.pointSize * 0.9
-                                        color: Kirigami.Theme.neutralTextColor
+                                        color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                                         wrapMode: Text.Wrap
                                         elide: Text.NoWrap
                                     }
@@ -235,7 +241,7 @@ Rectangle {
                                     Label {
                                         text: model.reclaimedSpace ? model.reclaimedSpace : ""
                                         font.pointSize: Kirigami.Theme.smallFont.pointSize
-                                        color: Kirigami.Theme.neutralTextColor
+                                        color: Kirigami.Theme.textColor
                                         visible: !root.isCompact && text !== ""
                                     }
                                 }
@@ -298,7 +304,11 @@ Rectangle {
                         height: visible ? implicitHeight : 0
                         
                         background: Rectangle {
-                            color: runningDelegate.hovered ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.1) : "transparent"
+                            color: runningDelegate.hovered
+                                ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.1)
+                                : SettingsManager.alternatingRowColors && index % 2 !== 0
+                                ? Qt.darker(Kirigami.Theme.backgroundColor, 1.06)
+                                : "transparent"
                         }
 
                         contentItem: ColumnLayout {
@@ -447,7 +457,7 @@ Rectangle {
         Label {
             text: UIStrings.ui.landing.potential_savings + (TaskRegistry.recommendedTasksModel ? TaskRegistry.recommendedTasksModel.totalReclaimedSpaceStr : "")
             font.pointSize: Kirigami.Theme.smallFont.pointSize
-            color: SettingsManager.emphasisColor
+            color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
             Layout.alignment: Qt.AlignHCenter
             visible: !root.isCompact && isReady && isHomeActive && selectedCount === 0 && TaskRegistry.recommendedTasksModel && TaskRegistry.recommendedTasksModel.totalPossibleReclaimedSpaceBytes > 0
             horizontalAlignment: Text.AlignHCenter
@@ -458,7 +468,7 @@ Rectangle {
         Label {
             text: activeTaskModel && activeTaskModel.totalReclaimedSpaceStr ? activeTaskModel.totalReclaimedSpaceStr : ""
             font.pointSize: Kirigami.Theme.smallFont.pointSize
-            color: SettingsManager.emphasisColor
+            color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
             Layout.alignment: Qt.AlignHCenter
             visible: !root.isCompact && isReady && selectedCount > 0 && text !== ""
             horizontalAlignment: Text.AlignHCenter

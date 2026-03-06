@@ -6,13 +6,12 @@ import org.kde.kirigami as Kirigami
 Kirigami.ScrollablePage {
     id: page
     objectName: "settingsPage"
-    background: null
     title: UIStrings.ui.settings.title
 
     titleDelegate: Item {}
 
     ColumnLayout {
-        width: page.width
+        Layout.fillWidth: true
         spacing: Kirigami.Units.largeSpacing
 
         Kirigami.FormLayout {
@@ -33,24 +32,10 @@ Kirigami.ScrollablePage {
                 opacity: 0.3
             }
 
-            SpinBox {
-                Kirigami.FormData.label: "Corner Radius"
-                from: 0
-                to: 24
-                value: SettingsManager.cornerRadius
-                onValueChanged: SettingsManager.cornerRadius = value
-            }
-
             Switch {
                 Kirigami.FormData.label: "Check for Updates on Startup"
                 checked: SettingsManager.checkUpdatesOnStartup
                 onCheckedChanged: SettingsManager.checkUpdatesOnStartup = checked
-            }
-
-            Switch {
-                Kirigami.FormData.label: "Contrast Borders"
-                checked: SettingsManager.enableContrastBorders
-                onCheckedChanged: SettingsManager.enableContrastBorders = checked
             }
 
             // --- SECTION: Home Page ---
@@ -105,12 +90,6 @@ Kirigami.ScrollablePage {
                 to: 10
                 value: SettingsManager.packageCacheCount
                 onValueChanged: SettingsManager.packageCacheCount = value
-            }
-
-            Switch {
-                Kirigami.FormData.label: "Confirm Package Removal"
-                checked: SettingsManager.confirmPackageRemoval
-                onCheckedChanged: SettingsManager.confirmPackageRemoval = checked
             }
 
             // --- SECTION: AppImage Manager ---
@@ -200,10 +179,64 @@ Kirigami.ScrollablePage {
                 onEditingFinished: SettingsManager.scriptsDir = text
             }
 
+            // --- SECTION: UI ---
+            Label {
+                Kirigami.FormData.isSection: true
+                text: "UI"
+                font.bold: true
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.topMargin: Kirigami.Units.largeSpacing
+            }
+            Kirigami.Separator {
+                Kirigami.FormData.isSection: true
+                Layout.fillWidth: true
+                opacity: 0.3
+            }
+
+            SpinBox {
+                Kirigami.FormData.label: "Corner Radius"
+                from: 0
+                to: 24
+                value: SettingsManager.cornerRadius
+                onValueChanged: SettingsManager.cornerRadius = value
+            }
+
+            Switch {
+                Kirigami.FormData.label: "Contrast Borders"
+                checked: SettingsManager.enableContrastBorders
+                onCheckedChanged: SettingsManager.enableContrastBorders = checked
+            }
+
+            Switch {
+                Kirigami.FormData.label: "Alternating Row Colors"
+                checked: SettingsManager.alternatingRowColors
+                onCheckedChanged: SettingsManager.alternatingRowColors = checked
+            }
+
+            TextField {
+                Kirigami.FormData.label: "Global Font"
+                Layout.fillWidth: true
+                placeholderText: "leave empty for system font"
+                text: SettingsManager.globalFont
+                onEditingFinished: SettingsManager.globalFont = text
+            }
+
+            SpinBox {
+                Kirigami.FormData.label: "Global Font Size"
+                from: 0
+                to: 72
+                value: SettingsManager.globalFontSize
+                onValueChanged: SettingsManager.globalFontSize = value
+                ToolTip.text: "Standard system font size is typically 10. Set to 0 to use the system default size."
+                ToolTip.visible: hovered
+                ToolTip.delay: Kirigami.Units.toolTipDelay
+            }
+
             // --- SECTION: Colors ---
             Label {
                 Kirigami.FormData.isSection: true
-                text: "Colors"
+                text: "UI Colors"
                 font.bold: true
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
@@ -223,16 +256,16 @@ Kirigami.ScrollablePage {
                     width: Kirigami.Units.iconSizes.small
                     height: Kirigami.Units.iconSizes.small
                     radius: 3
-                    color: SettingsManager.emphasisColor
+                    color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                     border.color: Kirigami.Theme.textColor
                     border.width: 1
                 }
 
                 TextField {
-                    placeholderText: "#ff8c00"
+                    placeholderText: "leave empty for system accent color"
                     text: SettingsManager.emphasisColor
                     onEditingFinished: {
-                        if (/^#[0-9a-fA-F]{6}$/.test(text))
+                        if (text === "" || /^#[0-9a-fA-F]{6}$/.test(text))
                             SettingsManager.emphasisColor = text
                     }
                 }
@@ -244,11 +277,11 @@ Kirigami.ScrollablePage {
                 Rectangle {
                     width: Kirigami.Units.iconSizes.small; height: Kirigami.Units.iconSizes.small
                     radius: 3
-                    color: SettingsManager.cpuColor || Kirigami.Theme.highlightColor
+                    color: SettingsManager.cpuColor !== "" ? SettingsManager.cpuColor : Kirigami.Theme.highlightColor
                     border.color: Kirigami.Theme.textColor; border.width: 1
                 }
                 TextField {
-                    placeholderText: "leave empty for system default"
+                    placeholderText: "leave empty for system accent color"
                     text: SettingsManager.cpuColor
                     onEditingFinished: {
                         if (text === "" || /^#[0-9a-fA-F]{6}$/.test(text))
@@ -263,11 +296,11 @@ Kirigami.ScrollablePage {
                 Rectangle {
                     width: Kirigami.Units.iconSizes.small; height: Kirigami.Units.iconSizes.small
                     radius: 3
-                    color: SettingsManager.memoryColor || Kirigami.Theme.positiveTextColor
+                    color: SettingsManager.memoryColor !== "" ? SettingsManager.memoryColor : Kirigami.Theme.highlightColor
                     border.color: Kirigami.Theme.textColor; border.width: 1
                 }
                 TextField {
-                    placeholderText: "leave empty for system default"
+                    placeholderText: "leave empty for system accent color"
                     text: SettingsManager.memoryColor
                     onEditingFinished: {
                         if (text === "" || /^#[0-9a-fA-F]{6}$/.test(text))
@@ -282,11 +315,11 @@ Kirigami.ScrollablePage {
                 Rectangle {
                     width: Kirigami.Units.iconSizes.small; height: Kirigami.Units.iconSizes.small
                     radius: 3
-                    color: SettingsManager.downloadColor || Kirigami.Theme.positiveTextColor
+                    color: SettingsManager.downloadColor !== "" ? SettingsManager.downloadColor : Kirigami.Theme.highlightColor
                     border.color: Kirigami.Theme.textColor; border.width: 1
                 }
                 TextField {
-                    placeholderText: "leave empty for system default"
+                    placeholderText: "leave empty for system accent color"
                     text: SettingsManager.downloadColor
                     onEditingFinished: {
                         if (text === "" || /^#[0-9a-fA-F]{6}$/.test(text))
@@ -301,11 +334,11 @@ Kirigami.ScrollablePage {
                 Rectangle {
                     width: Kirigami.Units.iconSizes.small; height: Kirigami.Units.iconSizes.small
                     radius: 3
-                    color: SettingsManager.uploadColor || Kirigami.Theme.neutralTextColor
+                    color: SettingsManager.uploadColor !== "" ? SettingsManager.uploadColor : Kirigami.Theme.highlightColor
                     border.color: Kirigami.Theme.textColor; border.width: 1
                 }
                 TextField {
-                    placeholderText: "leave empty for system default"
+                    placeholderText: "leave empty for system accent color"
                     text: SettingsManager.uploadColor
                     onEditingFinished: {
                         if (text === "" || /^#[0-9a-fA-F]{6}$/.test(text))
@@ -320,11 +353,11 @@ Kirigami.ScrollablePage {
                 Rectangle {
                     width: Kirigami.Units.iconSizes.small; height: Kirigami.Units.iconSizes.small
                     radius: 3
-                    color: SettingsManager.swapColor || Kirigami.Theme.neutralTextColor
+                    color: SettingsManager.swapColor !== "" ? SettingsManager.swapColor : Kirigami.Theme.highlightColor
                     border.color: Kirigami.Theme.textColor; border.width: 1
                 }
                 TextField {
-                    placeholderText: "leave empty for system default"
+                    placeholderText: "leave empty for system accent color"
                     text: SettingsManager.swapColor
                     onEditingFinished: {
                         if (text === "" || /^#[0-9a-fA-F]{6}$/.test(text))
@@ -338,11 +371,14 @@ Kirigami.ScrollablePage {
     Kirigami.OverlaySheet {
         id: favoriteTasksSheet
         title: UIStrings.ui.settings.favorite_tasks_title
+        implicitWidth: Kirigami.Units.gridUnit * 28
         
         ListView {
             id: favList
-            implicitWidth: Kirigami.Units.gridUnit * 25
-            implicitHeight: Kirigami.Units.gridUnit * 20
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 26
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 20
+            implicitHeight: Layout.preferredHeight
             clip: true
             model: TaskRegistry.allowedFavoriteTaskNames
             

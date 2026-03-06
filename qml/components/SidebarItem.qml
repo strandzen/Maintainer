@@ -40,6 +40,8 @@ ItemDelegate {
             text: control.text
             Layout.fillWidth: true
             elide: Text.ElideRight
+            font.family: SettingsManager.globalFont !== "" ? SettingsManager.globalFont : SettingsManager.defaultFontFamily
+            font.pointSize: SettingsManager.globalFontSize > 0 ? SettingsManager.globalFontSize : SettingsManager.defaultFontSize
             font.weight: Font.DemiBold
             visible: true
             opacity: control.width > (Kirigami.Units.iconSizes.smallMedium + (Kirigami.Units.largeSpacing * 3)) ? 1 : 0

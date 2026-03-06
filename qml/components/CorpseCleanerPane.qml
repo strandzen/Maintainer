@@ -23,25 +23,34 @@ Rectangle {
         font.weight: Font.DemiBold
     }
     
-    property real idealWidth: {
-        let dummy = updateTrigger; // Force re-eval on change
+    property real idealWidth: Kirigami.Units.gridUnit * 18
+    
+    function updateIdealWidth() {
         let maxW = 0;
         if (activeTask && activeTask.subItems) {
             let pItems = activeTask.subItems;
-            
-            // Limit to first 300 to avoid freezing on massive cleanup results
             let lim = Math.min(pItems.length, 300);
-            
             for (let i = 0; i < lim; i++) {
                 measureText.text = pItems[i].name;
                 if (measureText.width > maxW) maxW = measureText.width;
-                
                 measureText.text = pItems[i].description;
                 if (measureText.width > maxW) maxW = measureText.width;
             }
         }
-        return Math.max(Kirigami.Units.gridUnit * 18, Math.min(Kirigami.Units.gridUnit * 40, maxW + Kirigami.Units.gridUnit * 10));
+        let calculated = Math.max(Kirigami.Units.gridUnit * 18, Math.min(Kirigami.Units.gridUnit * 40, maxW + Kirigami.Units.gridUnit * 10));
+        if (idealWidth !== calculated) idealWidth = calculated;
     }
+
+    Timer {
+        id: widthTimer
+        interval: 100
+        repeat: false
+        onTriggered: paneRoot.updateIdealWidth()
+    }
+
+    onActiveTaskChanged: widthTimer.restart()
+    onUpdateTriggerChanged: widthTimer.restart()
+    Component.onCompleted: widthTimer.restart()
     
     // Helper to calculate total sizes
     function getSelectedTotal() {
@@ -237,7 +246,11 @@ Rectangle {
                                 height: visible ? implicitHeight : 0
                                 
                                 background: Rectangle {
-                                    color: del.hovered ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.1) : "transparent"
+                                    color: del.hovered
+                                        ? Qt.rgba(paneRoot.effectiveHighlight.r, paneRoot.effectiveHighlight.g, paneRoot.effectiveHighlight.b, 0.1)
+                                        : SettingsManager.alternatingRowColors && index % 2 !== 0
+                                        ? Qt.darker(Kirigami.Theme.backgroundColor, 1.06)
+                                        : "transparent"
                                 }
 
                                 contentItem: ColumnLayout {
@@ -274,7 +287,7 @@ Rectangle {
                                             Label {
                                                 text: modelData.description
                                                 font.pointSize: Kirigami.Theme.smallFont.pointSize * 0.9
-                                                color: Kirigami.Theme.neutralTextColor
+                                                color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                                                 wrapMode: Text.Wrap
                                                 Layout.fillWidth: true
                                             }
@@ -283,7 +296,7 @@ Rectangle {
                                         Label {
                                             text: Utils.formatBytes(modelData.sizeBytes)
                                             font.pointSize: Kirigami.Theme.smallFont.pointSize * 0.9
-                                            color: Kirigami.Theme.neutralTextColor
+                                            color: Kirigami.Theme.textColor
                                             Layout.alignment: Qt.AlignVCenter
                                         }
                                     }
@@ -314,7 +327,7 @@ Rectangle {
             Label {
                 text: paneRoot.getSelectedTotal() ? UIStrings.ui.corpse_cleaner.total_selected + paneRoot.getSelectedTotal() : ""
                 font.pointSize: Kirigami.Theme.smallFont.pointSize
-                color: SettingsManager.emphasisColor
+                color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                 Layout.alignment: Qt.AlignHCenter
                 visible: paneRoot.getSelectedCount() > 0
             }

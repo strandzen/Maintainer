@@ -6,7 +6,6 @@ import org.kde.kirigami as Kirigami
 Kirigami.ScrollablePage {
     id: page
     objectName: "appImageManagerPage"
-    background: null
     title: "AppImages"
 
     titleDelegate: Item {}

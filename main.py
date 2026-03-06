@@ -1,6 +1,5 @@
 import sys
 import os
-import subprocess
 from PyQt6.QtGui import QGuiApplication, QIcon
 from PyQt6.QtQml import QQmlApplicationEngine
 from PyQt6.QtCore import Qt, QUrl, QCoreApplication
@@ -28,26 +27,7 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-def launch_terminal(command):
-    """Try various terminal emulators to run the given command."""
-    # We add a read at the end so the user can see the output before the window closes
-    full_cmd = f"{command}; echo; echo '------------------------------------------'; echo 'Task complete. Press Enter to close this window...'; read"
-    term_configs = [
-        ["konsole", "-e", "bash", "-c", full_cmd],
-        ["gnome-terminal", "--", "bash", "-c", full_cmd],
-        ["xfce4-terminal", "-e", "bash", "-c", full_cmd],
-        ["xterm", "-e", "bash", "-c", full_cmd],
-    ]
-    for cmd_list in term_configs:
-        try:
-            subprocess.Popen(cmd_list)
-            return True
-        except Exception:
-            continue
-    return False
-
 def main():
-    print("🚀 MAINTAINER APP STARTING - DEBUG VERSION 2.0.1 (Markers Fix)")
     # Force KDE Plasma style for Qt Quick Controls
     os.environ["QT_QUICK_CONTROLS_STYLE"] = "org.kde.desktop"
     
@@ -71,6 +51,34 @@ def main():
     system_health = SystemHealth(app)
     task_engine = TaskEngine(app)
     settings_manager = SettingsManager(app)
+
+    # Capture the true system default font before we ever override it
+    from PyQt6.QtGui import QFont
+    system_default_font = QFont(app.font())
+    
+    # Store defaults in settings manager for QML to use as fallbacks
+    settings_manager.defaultFontFamily = system_default_font.family()
+    settings_manager.defaultFontSize = system_default_font.pointSize()
+
+    # Apply global font on startup and when changed
+    def apply_global_font():
+        font_name = settings_manager.globalFont
+        font_size = settings_manager.globalFontSize
+        
+        # Start with a clean copy of the original system font
+        font = QFont(system_default_font)
+        
+        if font_name:
+            font.setFamily(font_name)
+            
+        if font_size > 0:
+            font.setPointSize(font_size)
+            
+        app.setFont(font)
+
+    apply_global_font()
+    settings_manager.globalFontChanged.connect(apply_global_font)
+    settings_manager.globalFontSizeChanged.connect(apply_global_font)
 
     # Load tasks from configuration
     config_path = resource_path("tasks_config.json")
@@ -99,9 +107,6 @@ def main():
 
     # Initialize Package Manager
     package_manager = PackageManager(settings_manager=settings_manager, parent=app)
-    
-    # CONNECT TERMINAL POPUP SIGNAL
-    package_manager.upgradeActionTriggered.connect(launch_terminal)
 
     package_manager.refresh()
     if settings_manager.checkUpdatesOnStartup:

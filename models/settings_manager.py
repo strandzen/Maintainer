@@ -11,7 +11,6 @@ class SettingsManager(QObject):
     scriptsDirChanged = pyqtSignal()
     aurHelperChanged = pyqtSignal()
     checkUpdatesOnStartupChanged = pyqtSignal()
-    confirmPackageRemovalChanged = pyqtSignal()
     emphasisColorChanged = pyqtSignal()
     cpuColorChanged = pyqtSignal()
     memoryColorChanged = pyqtSignal()
@@ -19,6 +18,11 @@ class SettingsManager(QObject):
     uploadColorChanged = pyqtSignal()
     swapColorChanged = pyqtSignal()
     enableContrastBordersChanged = pyqtSignal()
+    alternatingRowColorsChanged = pyqtSignal()
+    globalFontChanged = pyqtSignal()
+    globalFontSizeChanged = pyqtSignal()
+    defaultFontFamilyChanged = pyqtSignal()
+    defaultFontSizeChanged = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -44,15 +48,22 @@ class SettingsManager(QObject):
             self.settings.setValue("aurHelper", "pacman")
         if not self.settings.contains("checkUpdatesOnStartup"):
             self.settings.setValue("checkUpdatesOnStartup", True)
-        if not self.settings.contains("confirmPackageRemoval"):
-            self.settings.setValue("confirmPackageRemoval", True)
         if not self.settings.contains("enableContrastBorders"):
             self.settings.setValue("enableContrastBorders", True)
         if not self.settings.contains("emphasisColor"):
-            self.settings.setValue("emphasisColor", "#ff8c00")
+            self.settings.setValue("emphasisColor", "")
         for key in ("cpuColor", "memoryColor", "downloadColor", "uploadColor", "swapColor"):
             if not self.settings.contains(key):
                 self.settings.setValue(key, "")
+        if not self.settings.contains("alternatingRowColors"):
+            self.settings.setValue("alternatingRowColors", False)
+        if not self.settings.contains("globalFont"):
+            self.settings.setValue("globalFont", "")
+        if not self.settings.contains("globalFontSize"):
+            self.settings.setValue("globalFontSize", 10)
+        
+        self._defaultFontFamily = ""
+        self._defaultFontSize = 10
 
     @pyqtProperty(int, notify=cornerRadiusChanged)
     def cornerRadius(self):
@@ -162,16 +173,6 @@ class SettingsManager(QObject):
             self.settings.setValue("checkUpdatesOnStartup", bool(value))
             self.checkUpdatesOnStartupChanged.emit()
 
-    @pyqtProperty(bool, notify=confirmPackageRemovalChanged)
-    def confirmPackageRemoval(self):
-        return bool(self.settings.value("confirmPackageRemoval", True, type=bool))
-
-    @confirmPackageRemoval.setter
-    def confirmPackageRemoval(self, value):
-        if self.confirmPackageRemoval != value:
-            self.settings.setValue("confirmPackageRemoval", bool(value))
-            self.confirmPackageRemovalChanged.emit()
-
     @pyqtProperty(bool, notify=enableContrastBordersChanged)
     def enableContrastBorders(self):
         return bool(self.settings.value("enableContrastBorders", True, type=bool))
@@ -184,7 +185,7 @@ class SettingsManager(QObject):
 
     @pyqtProperty(str, notify=emphasisColorChanged)
     def emphasisColor(self):
-        return str(self.settings.value("emphasisColor", "#ff8c00"))
+        return str(self.settings.value("emphasisColor", ""))
 
     @emphasisColor.setter
     def emphasisColor(self, value):
@@ -241,3 +242,53 @@ class SettingsManager(QObject):
         if self.swapColor != value:
             self.settings.setValue("swapColor", str(value))
             self.swapColorChanged.emit()
+
+    @pyqtProperty(bool, notify=alternatingRowColorsChanged)
+    def alternatingRowColors(self):
+        return bool(self.settings.value("alternatingRowColors", False, type=bool))
+
+    @alternatingRowColors.setter
+    def alternatingRowColors(self, value):
+        if self.alternatingRowColors != value:
+            self.settings.setValue("alternatingRowColors", bool(value))
+            self.alternatingRowColorsChanged.emit()
+
+    @pyqtProperty(str, notify=globalFontChanged)
+    def globalFont(self):
+        return str(self.settings.value("globalFont", ""))
+
+    @globalFont.setter
+    def globalFont(self, value):
+        if self.globalFont != value:
+            self.settings.setValue("globalFont", str(value))
+            self.globalFontChanged.emit()
+
+    @pyqtProperty(int, notify=globalFontSizeChanged)
+    def globalFontSize(self):
+        return int(self.settings.value("globalFontSize", 10))
+
+    @globalFontSize.setter
+    def globalFontSize(self, value):
+        if self.globalFontSize != value:
+            self.settings.setValue("globalFontSize", int(value))
+            self.globalFontSizeChanged.emit()
+
+    @pyqtProperty(str, notify=defaultFontFamilyChanged)
+    def defaultFontFamily(self):
+        return self._defaultFontFamily
+
+    @defaultFontFamily.setter
+    def defaultFontFamily(self, value):
+        if self._defaultFontFamily != value:
+            self._defaultFontFamily = str(value)
+            self.defaultFontFamilyChanged.emit()
+
+    @pyqtProperty(int, notify=defaultFontSizeChanged)
+    def defaultFontSize(self):
+        return self._defaultFontSize
+
+    @defaultFontSize.setter
+    def defaultFontSize(self, value):
+        if self._defaultFontSize != value:
+            self._defaultFontSize = int(value)
+            self.defaultFontSizeChanged.emit()

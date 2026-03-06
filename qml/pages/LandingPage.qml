@@ -7,7 +7,6 @@ import "../components"
 Kirigami.ScrollablePage {
     id: page
     objectName: "landingPage"
-    background: null
     title: UIStrings.ui.landing.title
 
     readonly property real customContentWidth: Math.max(Kirigami.Units.gridUnit * 10, Math.min(Kirigami.Units.gridUnit * 40, page.width - Kirigami.Units.gridUnit * 4))
@@ -15,7 +14,7 @@ Kirigami.ScrollablePage {
     titleDelegate: Item {}
 
     ColumnLayout {
-        width: parent.width
+        width: page.width
         anchors.margins: Kirigami.Units.largeSpacing
         spacing: Kirigami.Units.largeSpacing * 2
         

@@ -7,7 +7,6 @@ import "../components" as MyComponents
 Kirigami.Page {
     id: page
     objectName: "systemMonitorPage"
-    background: null
     title: UIStrings.ui.monitor.title
 
     titleDelegate: Item {}
@@ -33,7 +32,7 @@ Kirigami.Page {
     function headerColor(col) {
         return SystemHealth.sortColumn === col
             ? page.effectiveHighlight
-            : (UIColors.theme.neutral_text_hex || Kirigami.Theme.neutralTextColor)
+            : (SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor)
     }
 
     Rectangle {
@@ -100,7 +99,7 @@ Kirigami.Page {
                             currentText: (SystemHealth.cpuUsage * 100).toFixed(1) + "%"
                             values: SystemHealth.cpuHistory
                             autoScale: false
-                            accentColor: SettingsManager.cpuColor || page.effectiveHighlight
+                            accentColor: SettingsManager.cpuColor !== "" ? SettingsManager.cpuColor : Kirigami.Theme.highlightColor
                         }
 
                         // Memory
@@ -111,7 +110,7 @@ Kirigami.Page {
                             currentText: SystemHealth.ramTotalStr
                             values: SystemHealth.ramHistory
                             autoScale: false
-                            accentColor: SettingsManager.memoryColor || Kirigami.Theme.positiveTextColor
+                            accentColor: SettingsManager.memoryColor !== "" ? SettingsManager.memoryColor : Kirigami.Theme.highlightColor
                         }
 
                         // Download
@@ -122,7 +121,7 @@ Kirigami.Page {
                             currentText: page.formatSpeed(SystemHealth.netDownload)
                             values: SystemHealth.netDownHistory
                             autoScale: true
-                            accentColor: SettingsManager.downloadColor || Kirigami.Theme.positiveTextColor
+                            accentColor: SettingsManager.downloadColor !== "" ? SettingsManager.downloadColor : Kirigami.Theme.highlightColor
                         }
 
                         // Upload
@@ -133,7 +132,7 @@ Kirigami.Page {
                             currentText: page.formatSpeed(SystemHealth.netUpload)
                             values: SystemHealth.netUpHistory
                             autoScale: true
-                            accentColor: SettingsManager.uploadColor || Kirigami.Theme.neutralTextColor
+                            accentColor: SettingsManager.uploadColor !== "" ? SettingsManager.uploadColor : Kirigami.Theme.highlightColor
                         }
                     }
 
@@ -179,12 +178,12 @@ Kirigami.Page {
                                 Label {
                                     text: UIStrings.ui.monitor.swap
                                     font.weight: Font.DemiBold
-                                    color: UIColors.theme.neutral_text_hex || Kirigami.Theme.neutralTextColor
+                                    color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                                 }
                                 Item { Layout.fillWidth: true }
                                 Label {
                                     text: SystemHealth.swapTotalStr
-                                    color: Kirigami.Theme.neutralTextColor
+                                    color: Kirigami.Theme.textColor
                                     font.weight: Font.DemiBold
                                 }
                             }
@@ -201,7 +200,7 @@ Kirigami.Page {
                                 Kirigami.ShadowedRectangle {
                                     height: parent.height
                                     width: parent.width * SystemHealth.swapUsage
-                                    color: SettingsManager.swapColor || Kirigami.Theme.neutralTextColor
+                                    color: SettingsManager.swapColor !== "" ? SettingsManager.swapColor : Kirigami.Theme.highlightColor
                                     visible: width > 0
                                     corners.topLeftRadius: swapFrame.radius
                                     corners.bottomLeftRadius: swapFrame.radius
@@ -264,7 +263,7 @@ Kirigami.Page {
                         id: listHeader
                         Layout.fillWidth: true
                         Layout.leftMargin: Kirigami.Units.largeSpacing
-                        Layout.rightMargin: Kirigami.Units.largeSpacing
+                        Layout.rightMargin: Kirigami.Units.largeSpacing * 2.5
                         Layout.topMargin: Kirigami.Units.smallSpacing
                         Layout.bottomMargin: Kirigami.Units.smallSpacing
 
@@ -272,7 +271,7 @@ Kirigami.Page {
                             text: "PID" + page.sortIndicator("pid")
                             font.weight: Font.DemiBold
                             color: page.headerColor("pid")
-                            Layout.preferredWidth: listHeader.width * 0.1
+                            Layout.preferredWidth: appList.width * 0.1
                             horizontalAlignment: Text.AlignHCenter
                             MouseArea {
                                 anchors.fill: parent
@@ -284,7 +283,7 @@ Kirigami.Page {
                             text: UIStrings.ui.monitor.name + page.sortIndicator("name")
                             font.weight: Font.DemiBold
                             color: page.headerColor("name")
-                            Layout.preferredWidth: listHeader.width * 0.25
+                            Layout.preferredWidth: appList.width * 0.25
                             horizontalAlignment: Text.AlignHCenter
                             MouseArea {
                                 anchors.fill: parent
@@ -296,7 +295,7 @@ Kirigami.Page {
                             text: "User" + page.sortIndicator("user")
                             font.weight: Font.DemiBold
                             color: page.headerColor("user")
-                            Layout.preferredWidth: listHeader.width * 0.15
+                            Layout.preferredWidth: appList.width * 0.15
                             horizontalAlignment: Text.AlignHCenter
                             MouseArea {
                                 anchors.fill: parent
@@ -308,7 +307,7 @@ Kirigami.Page {
                             text: UIStrings.ui.monitor.cpu + page.sortIndicator("cpu")
                             font.weight: Font.DemiBold
                             color: page.headerColor("cpu")
-                            Layout.preferredWidth: listHeader.width * 0.15
+                            Layout.preferredWidth: appList.width * 0.15
                             horizontalAlignment: Text.AlignHCenter
                             MouseArea {
                                 anchors.fill: parent
@@ -320,7 +319,7 @@ Kirigami.Page {
                             text: UIStrings.ui.monitor.memory + page.sortIndicator("memory")
                             font.weight: Font.DemiBold
                             color: page.headerColor("memory")
-                            Layout.preferredWidth: listHeader.width * 0.2
+                            Layout.preferredWidth: appList.width * 0.2
                             horizontalAlignment: Text.AlignHCenter
                             MouseArea {
                                 anchors.fill: parent
@@ -355,8 +354,10 @@ Kirigami.Page {
                                 color: parent.highlighted
                                     ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.2)
                                     : parent.hovered
-                                        ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.1)
-                                        : "transparent"
+                                    ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.1)
+                                    : SettingsManager.alternatingRowColors && index % 2 !== 0
+                                    ? Qt.darker(Kirigami.Theme.backgroundColor, 1.06)
+                                    : "transparent"
                             }
 
                             contentItem: ColumnLayout {
@@ -364,7 +365,7 @@ Kirigami.Page {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.leftMargin: Kirigami.Units.largeSpacing
-                                    Layout.rightMargin: Kirigami.Units.largeSpacing
+                                    Layout.rightMargin: Kirigami.Units.largeSpacing * 2.5
                                     Layout.topMargin: Kirigami.Units.smallSpacing
                                     Layout.bottomMargin: Kirigami.Units.smallSpacing
                                     spacing: 0
@@ -372,7 +373,7 @@ Kirigami.Page {
                                     Label {
                                         text: model.pid
                                         Layout.preferredWidth: appList.width * 0.1
-                                        color: UIColors.theme.neutral_text_hex || Kirigami.Theme.neutralTextColor
+                                        color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                                         horizontalAlignment: Text.AlignHCenter
                                     }
                                     Label {
@@ -387,7 +388,7 @@ Kirigami.Page {
                                         text: model.user
                                         elide: Text.ElideRight
                                         Layout.preferredWidth: appList.width * 0.15
-                                        color: UIColors.theme.neutral_text_hex || Kirigami.Theme.neutralTextColor
+                                        color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                                         horizontalAlignment: Text.AlignHCenter
                                     }
                                     Label {
@@ -396,7 +397,7 @@ Kirigami.Page {
                                         color: {
                                             let v = parseFloat(model.cpu)
                                             if (v >= 50) return Kirigami.Theme.negativeTextColor
-                                            if (v >= 20) return Kirigami.Theme.neutralTextColor
+                                            if (v >= 20) return SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                                             return UIColors.theme.text_color_hex || Kirigami.Theme.textColor
                                         }
                                         horizontalAlignment: Text.AlignHCenter

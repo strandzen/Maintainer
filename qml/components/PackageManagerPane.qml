@@ -257,7 +257,7 @@ Rectangle {
                 BusyIndicator { Layout.alignment: Qt.AlignHCenter; running: parent.visible }
                 Label {
                     text: "Loading packages…"
-                    color: Kirigami.Theme.neutralTextColor
+                    color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                     Layout.alignment: Qt.AlignHCenter
                 }
             }
@@ -310,6 +310,8 @@ Rectangle {
                                 ? Qt.rgba(Kirigami.Theme.highlightColor.r,
                                           Kirigami.Theme.highlightColor.g,
                                           Kirigami.Theme.highlightColor.b, 0.08)
+                                : SettingsManager.alternatingRowColors && index % 2 !== 0
+                                ? Qt.darker(Kirigami.Theme.backgroundColor, 1.06)
                                 : "transparent"
                         }
 
@@ -384,7 +386,7 @@ Rectangle {
 
                             Label {
                                 text: model.version + "  " + (model.repo || "AUR")
-                                color: (mouseAreaRepo.containsMouse && (model.repo === "AUR" || model.repo === "")) ? Kirigami.Theme.highlightColor : Kirigami.Theme.neutralTextColor
+                                color: (mouseAreaRepo.containsMouse && (model.repo === "AUR" || model.repo === "")) ? Kirigami.Theme.highlightColor : (SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor)
                                 font.pointSize: Kirigami.Theme.smallFont.pointSize
                                 font.underline: (mouseAreaRepo.containsMouse && (model.repo === "AUR" || model.repo === ""))
                                 Layout.alignment: Qt.AlignVCenter
@@ -479,7 +481,7 @@ Rectangle {
 
                         Label {
                             text: "Checking dependencies…"
-                            color: Kirigami.Theme.neutralTextColor
+                            color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                             Layout.alignment: Qt.AlignVCenter
                         }
                     }
@@ -509,7 +511,7 @@ Rectangle {
                                 return total + " package" + (total !== 1 ? "s" : "") + " will be " + futureActionWord + sizeStr
                             }
                             font.bold: true
-                            color: Kirigami.Theme.neutralTextColor
+                            color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                             wrapMode: Text.Wrap
                         }
 
@@ -528,7 +530,7 @@ Rectangle {
                                     let actionWord = PackageManager.mode === "installed" ? "removes" : "installs"
                                     return "Also " + actionWord + " " + n + " dep" + (n !== 1 ? "s" : "") + ":"
                                 }
-                                color: Kirigami.Theme.neutralTextColor
+                                color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                             }
 
                             Rectangle {
@@ -547,7 +549,7 @@ Rectangle {
                                     delegate: Label {
                                         width: ListView.view.width
                                         text: "• " + modelData
-                                        color: Kirigami.Theme.neutralTextColor
+                                        color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                                         topPadding: 1
                                         bottomPadding: 1
                                     }
@@ -569,7 +571,7 @@ Rectangle {
                 text: pkgListView.count === PackageManager.packageCount
                     ? PackageManager.packageCount + " packages"
                     : pkgListView.count + " / " + PackageManager.packageCount + " packages"
-                color: Kirigami.Theme.neutralTextColor
+                color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                 font.pointSize: Kirigami.Theme.smallFont.pointSize
             }
 
@@ -578,7 +580,7 @@ Rectangle {
             Label {
                 visible: PackageManager.updateCount > 0 && paneRoot.selectedCount === 0 && PackageManager.mode === "installed"
                 text: PackageManager.updateCount + " update" + (PackageManager.updateCount !== 1 ? "s" : "")
-                color: Kirigami.Theme.neutralTextColor
+                color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
                 font.pointSize: Kirigami.Theme.smallFont.pointSize
                 font.weight: Font.Medium
             }
@@ -590,7 +592,7 @@ Rectangle {
             visible: PackageManager.progressText !== ""
             text: PackageManager.progressText
             wrapMode: Text.Wrap
-            color: Kirigami.Theme.neutralTextColor
+            color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
             font.pointSize: Kirigami.Theme.smallFont.pointSize
             font.italic: true
         }
@@ -761,6 +763,14 @@ Rectangle {
                 }
             }
         }
+
+        // Persistent reboot recommendation banner
+        Kirigami.InlineMessage {
+            Layout.fillWidth: true
+            visible: PackageManager.needsReboot
+            type: Kirigami.MessageType.Warning
+            text: "Reboot recommended — kernel or core system packages were upgraded."
+        }
     }
 
     // ── Action progress overlay ───────────────────────────────────────────────
@@ -773,11 +783,13 @@ Rectangle {
                 ? (PackageManager.mode === "installed" ? "Removing Packages…" : "Installing Packages…")
                 : "Action Output"
 
-        width: Math.min(Kirigami.Units.gridUnit * 45, paneRoot.width * 0.95)
+        implicitWidth: Kirigami.Units.gridUnit * 40
 
         ColumnLayout {
             spacing: Kirigami.Units.largeSpacing
-            width: confirmRemovalSheet.width - confirmRemovalSheet.leftPadding - confirmRemovalSheet.rightPadding
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 38
+            Layout.fillWidth: false
+            Layout.alignment: Qt.AlignHCenter
 
             ProgressBar {
                 visible: PackageManager.isRemoving || PackageManager.isUpgrading
@@ -818,12 +830,22 @@ Rectangle {
                 }
             }
 
+            // Reboot recommendation (shown after upgrade completes)
+            Kirigami.InlineMessage {
+                Layout.fillWidth: true
+                visible: PackageManager.needsReboot && !PackageManager.isUpgrading
+                type: Kirigami.MessageType.Warning
+                text: "A reboot is recommended to apply kernel or system library updates."
+            }
+
             // Close / Abort button
             Button {
-                visible: PackageManager.removalOutput !== ""
+                visible: PackageManager.removalOutput !== "" || PackageManager.isUpgrading || PackageManager.isRemoving
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
                 text: (PackageManager.isRemoving || PackageManager.isUpgrading) ? "Abort" : "Close"
                 background: Rectangle {
-                    color: parent.down 
+                    color: parent.down
                         ? Qt.rgba(Kirigami.Theme.negativeTextColor.r, Kirigami.Theme.negativeTextColor.g, Kirigami.Theme.negativeTextColor.b, 0.2)
                         : parent.hovered && (PackageManager.isRemoving || PackageManager.isUpgrading)
                         ? Qt.rgba(Kirigami.Theme.negativeTextColor.r, Kirigami.Theme.negativeTextColor.g, Kirigami.Theme.negativeTextColor.b, 0.1)
@@ -845,7 +867,6 @@ Rectangle {
                         confirmRemovalSheet.close()
                     }
                 }
-                Layout.alignment: Qt.AlignRight
             }
         }
     }

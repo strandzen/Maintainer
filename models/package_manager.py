@@ -632,8 +632,8 @@ class PackageManager(QObject):
     depsReady                = pyqtSignal(list, str)
     removalDone              = pyqtSignal(bool)
     pkgbuildContentChanged   = pyqtSignal()
-    upgradeActionTriggered   = pyqtSignal(str)
     sortOrderChanged         = pyqtSignal()
+    needsRebootChanged       = pyqtSignal()
 
     def __init__(self, settings_manager=None, parent=None):
         super().__init__(parent)
@@ -651,6 +651,7 @@ class PackageManager(QObject):
         self._update_count = 0
         self._progress_text = ""
         self._removal_output = ""
+        self._needs_reboot = False
         self._search_query = ""
         self._show_explicit_only = True # Defaults
         self._show_pretty_names = True  # Defaults
@@ -769,6 +770,40 @@ class PackageManager(QObject):
         if self._removal_output:
             self._removal_output = ""
             self.removalOutputChanged.emit()
+
+    @pyqtProperty(bool, notify=needsRebootChanged)
+    def needsReboot(self):
+        return self._needs_reboot
+
+    def _set_needs_reboot(self, val):
+        if self._needs_reboot != val:
+            self._needs_reboot = val
+            self.needsRebootChanged.emit()
+
+    _REBOOT_PKGS = {
+        'linux', 'linux-cachyos', 'linux-zen', 'linux-lts', 'linux-hardened',
+        'glibc', 'systemd',
+    }
+
+    def _check_reboot_required(self):
+        import re, os as _os
+        output = self._removal_output or ""
+        for line in output.splitlines():
+            m = re.search(r'\bupgrading\s+(\S+)|\binstalling\s+(\S+)', line)
+            if m:
+                pkg = (m.group(1) or m.group(2) or "").strip()
+                if pkg in self._REBOOT_PKGS or (
+                    pkg.startswith('linux') and
+                    pkg not in {'linux-firmware', 'linux-headers', 'linux-api-headers'}
+                ):
+                    return True
+        try:
+            running = _os.uname().release
+            if not _os.path.exists(f"/usr/lib/modules/{running}"):
+                return True
+        except Exception:
+            pass
+        return False
 
     @pyqtProperty(bool, notify=showGroupedChanged)
     def showGrouped(self):
@@ -1020,22 +1055,17 @@ class PackageManager(QObject):
     @pyqtSlot()
     def upgrade(self):
         self._set_upgrading(True)
-        # We always use -Syu for the actual upgrade to ensure full system sync and safety.
-        cmd = "paru -Syu"
-        if self._settings_manager and self._settings_manager.aurHelper == "pacman":
-            cmd = "sudo pacman -Syu"
-        
-        # This emit triggers the terminal popup via main.py or similar
-        self.upgradeActionTriggered.emit(cmd)
-        # We don't set upgrading to false here, we wait for the user to potentially refresh 
-        # or the app to detect success. For now, we'll reset it after a delay or just let it be.
-        # Actually, the user usually closes the terminal, we don't have a reliable callback.
-        # So we'll reset it so they can click again if needed.
-        self._set_upgrading(False)
+        self._clear_removal_output()
+        aur_helper = self._settings_manager.aurHelper if self._settings_manager else "pacman"
+        self.upgrade_worker = UpgradeWorker(aur_helper, parent=self)
+        self.upgrade_worker.progress.connect(self._append_removal_output)
+        self.upgrade_worker.finished.connect(self._on_upgrade_finished)
+        self.upgrade_worker.start()
 
     def _on_upgrade_finished(self, success):
         self._set_upgrading(False)
         if success:
+            self._set_needs_reboot(self._check_reboot_required())
             # Refresh list and clear update indicators
             self._updatable = set()
             self._update_update_count()

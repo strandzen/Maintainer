@@ -12,6 +12,9 @@ ApplicationWindow {
     visible: true
     title: UIStrings.ui.main.title
 
+    font.family: SettingsManager.globalFont !== "" ? SettingsManager.globalFont : SettingsManager.defaultFontFamily
+    font.pointSize: SettingsManager.globalFontSize > 0 ? SettingsManager.globalFontSize : SettingsManager.defaultFontSize
+
     Kirigami.Theme.inherit: true
     Kirigami.Theme.colorSet: Kirigami.Theme.Window
 
@@ -189,7 +192,14 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 defaultColumnWidth: width
-                initialPage: Qt.resolvedUrl("pages/LandingPage.qml")
+                // Deliberately empty; pushed via Timer to ensure window is fully initialized
+            }
+
+            Timer {
+                interval: 250 // Increased delay for slower systems
+                running: true
+                repeat: false
+                onTriggered: myPageStack.push(Qt.resolvedUrl("pages/LandingPage.qml"))
             }
 
             // Persistent Status Bars removed
@@ -262,14 +272,16 @@ ApplicationWindow {
     Kirigami.OverlaySheet {
         id: globalConfirmSheet
         title: "Confirm Deletion"
-        // Force width to help horizontal centering
-        width: Math.min(Kirigami.Units.gridUnit * 40, mainWindow.width * 0.9)
+        implicitWidth: Kirigami.Units.gridUnit * 40
+        implicitHeight: confirmLayout.implicitHeight + Kirigami.Units.gridUnit * 2
         
         ColumnLayout {
             id: confirmLayout
             spacing: Kirigami.Units.largeSpacing
             width: Kirigami.Units.gridUnit * 38
-            anchors.horizontalCenter: parent.horizontalCenter
+            implicitHeight: Kirigami.Units.gridUnit * 12 // Pin height to break loop
+            Layout.fillWidth: false
+            Layout.alignment: Qt.AlignHCenter
             
             Label {
                 text: "The following specific folders will be completely deleted. This action cannot be undone. Are you sure you want to proceed?"
