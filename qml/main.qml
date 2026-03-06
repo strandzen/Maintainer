@@ -184,9 +184,9 @@ ApplicationWindow {
         // 2. Central Content
         ColumnLayout {
             id: centerColumn
-            SplitView.fillWidth: myPageStack.currentItem && (myPageStack.currentItem.objectName === "landingPage" || myPageStack.currentItem.objectName === "systemMonitorPage" || myPageStack.currentItem.objectName === "settingsPage")
+            SplitView.fillWidth: myPageStack.currentItem && (myPageStack.currentItem.objectName === "landingPage" || myPageStack.currentItem.objectName === "settingsPage")
             Layout.preferredWidth: visible ? -1 : 0
-            visible: !myPageStack.currentItem || (myPageStack.currentItem.objectName === "landingPage" || myPageStack.currentItem.objectName === "systemMonitorPage" || myPageStack.currentItem.objectName === "settingsPage")
+            visible: !myPageStack.currentItem || (myPageStack.currentItem.objectName === "landingPage" || myPageStack.currentItem.objectName === "settingsPage")
             Kirigami.PageRow {
                 id: myPageStack
                 Layout.fillWidth: true
@@ -208,15 +208,13 @@ ApplicationWindow {
         // 3. Right Progress
         Loader {
             id: rightPaneLoader
-            SplitView.fillWidth: myPageStack.currentItem && (myPageStack.currentItem.objectName !== "landingPage" && myPageStack.currentItem.objectName !== "systemMonitorPage" && myPageStack.currentItem.objectName !== "settingsPage")
+            SplitView.fillWidth: myPageStack.currentItem && (myPageStack.currentItem.objectName !== "landingPage" && myPageStack.currentItem.objectName !== "settingsPage")
             SplitView.preferredWidth: {
-                if (myPageStack.currentItem && (myPageStack.currentItem.objectName !== "landingPage" && myPageStack.currentItem.objectName !== "systemMonitorPage" && myPageStack.currentItem.objectName !== "settingsPage")) return -1;
+                if (myPageStack.currentItem && (myPageStack.currentItem.objectName !== "landingPage" && myPageStack.currentItem.objectName !== "settingsPage")) return -1;
                 return item && item.idealWidth ? item.idealWidth : Kirigami.Units.gridUnit * 18
             }
             SplitView.minimumWidth: Kirigami.Units.gridUnit * 10
-            visible: myPageStack.currentItem
-                     && myPageStack.currentItem.objectName !== "settingsPage"
-                     && myPageStack.currentItem.objectName !== "systemMonitorPage"
+            visible: myPageStack.currentItem && myPageStack.currentItem.objectName !== "settingsPage" && myPageStack.currentItem.objectName !== "landingPage"
             
             // Swap between regular Action Queue and Corpse Cleaner Results
             sourceComponent: {

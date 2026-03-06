@@ -1,18 +1,10 @@
 {
     "categories": [
         {
-            "id": "clean_system",
-            "name": "Clean System",
-            "icon": "clean",
+            "id": "tools",
+            "name": "Tools",
+            "icon": "tools",
             "tasks": [
-                {
-                    "name": "Clean Journalctl Logs",
-                    "description": "Retains only recent systemd logs.",
-                    "command": "journalctl --vacuum-time={log_age}",
-                    "size_command": "journalctl --disk-usage | awk '/take up/ {print $7}'",
-                    "is_recommended": true,
-                    "requires_privilege": false
-                },
                 {
                     "name": "Clear Pacman Cache",
                     "description": "Removes old versions of installed packages, keeping the most recent versions.",
@@ -22,20 +14,11 @@
                     "requires_privilege": false
                 },
                 {
-                    "name": "Clear User Cache",
-                    "description": "Selective clearing of ~/.cache/ for specific resource-heavy applications. (Downloads, thumbnails, tech clutter)",
-                    "command": "rm -rf ~/.cache/thumbnails/* && rm -rf ~/.cache/yay/*",
-                    "size_command": "du -sh ~/.cache/thumbnails ~/.cache/yay 2>/dev/null | awk '{sum+=$1} END {print sum \"M\"}'",
-                    "is_recommended": false,
-                    "requires_privilege": false
-                },
-                {
                     "name": "Remove Orphan Packages",
                     "description": "Finds and removes packages that were installed as dependencies but are no longer required.",
                     "command": "pacman -Qtdq | xargs -r pkexec pacman -Rns --noconfirm",
                     "size_command": "pacman -Qtdq | pacman -Qi - | awk '{if ($1 == \"Installed\") sum+=$4} END {if (sum > 1024) printf \"%.1f MB\", sum/1024; else if (sum > 0) printf \"%.1f KB\", sum; else print \"0 MB\"}'",
                     "is_recommended": true,
-                    "is_advanced": false,
                     "requires_privilege": true
                 },
                 {
@@ -47,11 +30,38 @@
                     "requires_privilege": false
                 },
                 {
-                    "name": "Simulation Test",
-                    "description": "A dummy task to test the execution flow safely.",
-                    "command": "sleep 2 && echo 'Simulation successful.'",
-                    "is_recommended": true,
+                    "name": "Shader Cache Purge",
+                    "description": "Clears stale GPU shader caches (NVIDIA, Mesa) to prevent stuttering after driver updates.",
+                    "command": "rm -rf ~/.cache/nvidia/GLCache ~/.nv/GLCache ~/.cache/mesa_shader_cache",
+                    "size_command": "du -sh ~/.cache/nvidia/GLCache ~/.nv/GLCache ~/.cache/mesa_shader_cache 2>/dev/null | awk '{sum+=$1} END {print sum \"M\"}'",
+                    "is_recommended": false,
                     "requires_privilege": false
+                },
+                {
+                    "name": "Pacman Keyring Repair",
+                    "description": "Initializes and populates the Pacman keyring, then refreshes keys to fix signature errors.",
+                    "command": "pacman-key --init && pacman-key --populate && pacman-key --refresh-keys",
+                    "size_command": "",
+                    "is_recommended": false,
+                    "is_advanced": true,
+                    "requires_privilege": true
+                },
+                {
+                    "name": "Pacman Sync Databases",
+                    "description": "Synchronizes the local package database with the remote repositories.",
+                    "command": "pacman -Sy",
+                    "size_command": "",
+                    "is_recommended": true,
+                    "requires_privilege": true
+                },
+                {
+                    "name": "Pacman Rank Mirrors",
+                    "description": "Uses reflector to rank and save the fastest HTTPS mirrors to /etc/pacman.d/mirrorlist.",
+                    "command": "reflector --save /etc/pacman.d/mirrorlist --protocol https --latest 20 --sort rate",
+                    "size_command": "",
+                    "is_recommended": false,
+                    "is_advanced": true,
+                    "requires_privilege": true
                 }
             ]
         },
@@ -66,64 +76,6 @@
                     "type": "ghost_config",
                     "is_recommended": false,
                     "requires_privilege": false
-                }
-            ]
-        },
-        {
-            "id": "maintain_system",
-            "name": "Maintain System",
-            "icon": "maintain_system",
-            "tasks": [
-                {
-                    "name": "Check Failed Services",
-                    "description": "Lists any systemd services that have failed to start.",
-                    "command": "systemctl --failed",
-                    "size_command": "",
-                    "is_recommended": true,
-                    "requires_privilege": false
-                },
-                {
-                    "name": "NVIDIA Shader Cache Purge",
-                    "description": "Clears stale shader caches to prevent stuttering in games after driver updates.",
-                    "command": "rm -rf ~/.cache/nvidia/GLCache ~/.nv/GLCache",
-                    "size_command": "du -sh ~/.cache/nvidia/GLCache ~/.nv/GLCache 2>/dev/null | awk '{sum+=$1} END {print sum \"M\"}'",
-                    "is_recommended": false,
-                    "is_advanced": false,
-                    "requires_privilege": false
-                },
-                {
-                    "name": "Pacman Keyring Repair",
-                    "description": "Initializes and populates the Pacman keyring, then refreshes keys to fix signature errors.",
-                    "command": "pacman-key --init && pacman-key --populate && pacman-key --refresh-keys",
-                    "size_command": "",
-                    "is_recommended": false,
-                    "is_advanced": true,
-                    "requires_privilege": true
-                },
-                {
-                    "name": "Pacman Lock-file Repair",
-                    "description": "Removal of the db.lck file if the package manager is locked following a system crash.",
-                    "command": "rm -f /var/lib/pacman/db.lck",
-                    "size_command": "",
-                    "is_recommended": false,
-                    "is_advanced": true,
-                    "requires_privilege": true
-                },
-                {
-                    "name": "Simulation Test",
-                    "description": "A dummy task to test the execution flow safely.",
-                    "command": "sleep 2 && echo 'Simulation successful.'",
-                    "is_recommended": true,
-                    "requires_privilege": false
-                },
-                {
-                    "name": "Systemd Journal Integrity",
-                    "description": "Verifies journalctl log corruption and vacuums size to 500M to maintain footprint.",
-                    "command": "journalctl --verify && journalctl --vacuum-size=500M",
-                    "size_command": "journalctl --disk-usage | awk '/take up/ {print $7}'",
-                    "is_recommended": true,
-                    "is_advanced": true,
-                    "requires_privilege": true
                 }
             ]
         }

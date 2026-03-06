@@ -2,19 +2,11 @@
     "main": {
         "title": "Maintainer",
         "home": "Home",
-        "monitor": "Monitor",
         "settings": "Settings"
     },
     "landing": {
         "title": "Home",
-        "app_name": "Arch System Maintainer",
-        "app_description": "A comprehensive system maintenance tool tailored for Arch Linux. Easily clean away unused package caches, lingering config corpses, and old logs to reclaim space. Monitor system resources, discover and manage AppImages, and run custom maintenance scripts all in one seamless application.",
-        "ssd_health": "SSD health",
-        "ram_available": "RAM available",
-        "storage_available": "Storage available",
-        "run_recommended": "Run Recommended Tasks",
-        "potential_savings": "Potential space savings: ",
-        "reclaimed_suffix": " reclaimed"
+        "app_name": "Arch System Maintainer"
     },
     "running": {
         "title": "Running tasks",
@@ -29,18 +21,11 @@
     },
     "monitor": {
         "title": "System Monitor",
-        "overview": "Overview",
         "cpu": "CPU",
         "memory": "Memory",
         "swap": "Swap",
-        "disks": "Disks",
-        "networks": "Networks",
-        "applications": "Applications",
-        "processes": "Processes",
-        "name": "Name",
         "download": "Download",
-        "upload": "Upload",
-        "ipv4": "IPv4"
+        "upload": "Upload"
     },
     "settings": {
         "title": "Settings",
@@ -51,10 +36,7 @@
         "placeholder_ghost": "UUIDs or Paths (comma-separated)...",
         "label_custom_paths": "Additional Corpse Cleaner Paths (comma-separated):",
         "placeholder_custom_paths": "/path/to/cache, /another/path",
-        "label_developer_mode": "Developer Mode",
-        "favorite_tasks_title": "Select Favorite Tasks",
-        "label_scripts_dir": "Path to scripts",
-        "placeholder_scripts_dir": "/path/to/my/scripts"
+        "label_developer_mode": "Developer Mode"
     },
     "corpse_cleaner": {
         "title": "Corpse Cleaner",
@@ -88,10 +70,6 @@
     "maintain_system": {
         "title": "System Maintenance",
         "description": "Advanced tools to check system health, repair package manager locks, and manage failed system services."
-    },
-    "scripts": {
-        "title": "Custom Scripts",
-        "description": "Execute your own maintenance and automation scripts safely through the Maintainer interface."
     },
     "selection": {
         "recommended_label": " (recommended)",

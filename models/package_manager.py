@@ -634,6 +634,7 @@ class PackageManager(QObject):
     pkgbuildContentChanged   = pyqtSignal()
     sortOrderChanged         = pyqtSignal()
     needsRebootChanged       = pyqtSignal()
+    repoFilterChanged        = pyqtSignal()
 
     def __init__(self, settings_manager=None, parent=None):
         super().__init__(parent)
@@ -660,6 +661,7 @@ class PackageManager(QObject):
         self._selected_packages = {}
         self._pkgbuild_content = ""
         self._sort_order = "name_asc"  # name_asc | name_desc | size_asc | size_desc
+        self._selected_repos: set = set()  # empty = show all repos
 
         # Favorites: load once, cache in memory
         self._favs_file = os.path.join(
@@ -831,6 +833,19 @@ class PackageManager(QObject):
             self.sortOrderChanged.emit()
             self._rebuild_model()
 
+    @pyqtProperty('QStringList', notify=repoFilterChanged)
+    def repoFilter(self):
+        return list(self._selected_repos)
+
+    @pyqtSlot(str)
+    def toggle_repo_filter(self, repo: str):
+        if repo in self._selected_repos:
+            self._selected_repos.discard(repo)
+        else:
+            self._selected_repos.add(repo)
+        self.repoFilterChanged.emit()
+        self._rebuild_model()
+
     def _execute_search(self):
         if self._mode == "browse":
             self._run_browse_search()
@@ -898,6 +913,13 @@ class PackageManager(QObject):
                 q = self._search_query.lower()
                 filtered_packages = [p for p in self._packages if q in p["name"].lower()]
 
+            # Repo filter (empty set = show all)
+            if self._selected_repos:
+                filtered_packages = [
+                    p for p in filtered_packages
+                    if p.get("repo", "Unknown") in self._selected_repos
+                ]
+
             # Build a sort key function based on _sort_order
             if self._sort_order == "name_desc":
                 def _secondary_key(x):
@@ -920,7 +942,10 @@ class PackageManager(QObject):
                     _secondary_key(x),
                 ))
             else:
-                filtered_packages = sorted(filtered_packages, key=_secondary_key)
+                filtered_packages = sorted(filtered_packages, key=lambda x: (
+                    x["name"] not in self._updatable,
+                    _secondary_key(x),
+                ))
         else:
             # Browse mode: already filtered remotely, just merge selected items to the top
             filtered_packages = list(self._browse_packages)

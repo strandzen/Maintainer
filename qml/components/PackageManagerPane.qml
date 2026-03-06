@@ -122,6 +122,7 @@ Rectangle {
 
             TabButton {
                 text: "Manage"
+                Layout.fillWidth: true
                 contentItem: Label {
                     text: parent.text
                     horizontalAlignment: Text.AlignHCenter
@@ -136,6 +137,7 @@ Rectangle {
             }
             TabButton {
                 text: "Browse"
+                Layout.fillWidth: true
                 contentItem: Label {
                     text: parent.text
                     horizontalAlignment: Text.AlignHCenter
@@ -173,7 +175,7 @@ Rectangle {
                     y: filterBtn.height
 
                     MenuItem {
-                        text: "Show Explicitly Installed"
+                        text: "Hide Dependencies"
                         checkable: true
                         checked: PackageManager.showExplicitOnly
                         onToggled: PackageManager.set_show_explicit_only(checked)
@@ -189,6 +191,39 @@ Rectangle {
                         checkable: true
                         checked: PackageManager.showGrouped
                         onToggled: PackageManager.set_show_grouped(checked)
+                    }
+
+                    MenuSeparator {}
+
+                    MenuItem {
+                        text: "Core"
+                        checkable: true
+                        checked: PackageManager.repoFilter.includes("core")
+                        onToggled: PackageManager.toggle_repo_filter("core")
+                    }
+                    MenuItem {
+                        text: "Extra"
+                        checkable: true
+                        checked: PackageManager.repoFilter.includes("extra")
+                        onToggled: PackageManager.toggle_repo_filter("extra")
+                    }
+                    MenuItem {
+                        text: "Multilib"
+                        checkable: true
+                        checked: PackageManager.repoFilter.includes("multilib")
+                        onToggled: PackageManager.toggle_repo_filter("multilib")
+                    }
+                    MenuItem {
+                        text: "AUR"
+                        checkable: true
+                        checked: PackageManager.repoFilter.includes("AUR")
+                        onToggled: PackageManager.toggle_repo_filter("AUR")
+                    }
+                    MenuItem {
+                        text: "Local"
+                        checkable: true
+                        checked: PackageManager.repoFilter.includes("Unknown")
+                        onToggled: PackageManager.toggle_repo_filter("Unknown")
                     }
                 }
             }
@@ -280,24 +315,34 @@ Rectangle {
                     boundsBehavior: Flickable.StopAtBounds
 
                     ScrollBar.vertical: ScrollBar {
+                        id: pkgScrollBar
                         policy: ScrollBar.AlwaysOn
                         visible: pkgListView.contentHeight > pkgListView.height
+                    }
+
+                    Kirigami.Separator {
+                        anchors.right: parent.right
+                        anchors.rightMargin: pkgScrollBar.width
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        visible: pkgScrollBar.visible
+                        opacity: 0.5
                     }
 
                     section.property: PackageManager.showGrouped ? "group" : ""
                     section.criteria: ViewSection.FullString
                     section.delegate: Kirigami.ListSectionHeader {
-                        width: pkgListView.width
+                        width: pkgListView.width - pkgScrollBar.width
                         text: section
                         visible: PackageManager.showGrouped
                     }
 
                     delegate: ItemDelegate {
                         id: pkgDel
-                        width: pkgListView.width
+                        width: pkgListView.width - pkgScrollBar.width
                         leftPadding: Kirigami.Units.smallSpacing
                         // Provide enough right padding so the scrollbar does not occlude the text
-                        rightPadding: 40
+                        rightPadding: Kirigami.Units.smallSpacing
                         topPadding: Kirigami.Units.smallSpacing / 2
                         bottomPadding: Kirigami.Units.smallSpacing / 2
 
@@ -366,7 +411,7 @@ Rectangle {
                                 Layout.preferredWidth: Kirigami.Units.iconSizes.small
                                 Layout.preferredHeight: Kirigami.Units.iconSizes.small
                                 Layout.alignment: Qt.AlignVCenter
-                                color: Kirigami.Theme.highlightColor
+                                color: model.updateStatus === "available" ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.highlightColor
                             }
 
                             // Placeholder for Favorite Star
@@ -386,7 +431,11 @@ Rectangle {
 
                             Label {
                                 text: model.version + "  " + (model.repo || "AUR")
-                                color: (mouseAreaRepo.containsMouse && (model.repo === "AUR" || model.repo === "")) ? Kirigami.Theme.highlightColor : (SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor)
+                                color: model.updateStatus === "available"
+                                    ? Kirigami.Theme.positiveTextColor
+                                    : (mouseAreaRepo.containsMouse && (model.repo === "AUR" || model.repo === ""))
+                                        ? Kirigami.Theme.highlightColor
+                                        : (SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor)
                                 font.pointSize: Kirigami.Theme.smallFont.pointSize
                                 font.underline: (mouseAreaRepo.containsMouse && (model.repo === "AUR" || model.repo === ""))
                                 Layout.alignment: Qt.AlignVCenter

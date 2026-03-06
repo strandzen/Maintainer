@@ -312,7 +312,13 @@ Rectangle {
                             }
                         }
 
-                        ScrollBar {
+                        Kirigami.Separator {
+                                Layout.fillHeight: true
+                                visible: resultsScroll.visible
+                                opacity: 0.5
+                            }
+
+                            ScrollBar {
                             id: resultsScroll
                             Layout.fillHeight: true
                             policy: ScrollBar.AlwaysOn

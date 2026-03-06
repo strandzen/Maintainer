@@ -31,7 +31,8 @@ The goal was to create a AppImages and Packages (pacman) discovery/management hu
 - 📦 **Native Package Manager**: Comprehensive interface for Arch Linux package management, supporting the AUR with `paru`
 - 🎁 **AppImage Hub**: A centralized manager to browse, download, launch, and update AppImages with integrated version tracking and GitHub release checking.
 - 🧹 **Corpse Cleaner**: Intelligent identification and deep scanning for orphaned configuration files, cache directories, and system "dead weight" from uninstalled software.
-- 🗑️ **Clean System Files**: Safely remove standard package caches, clear old system logs, and purge orphaned dependencies to reclaim valuable disk space.
+- 🗑️ **Clean System Files**: Safely remove standard package caches, clear old system logs, and purge orphaned dependencies to reclaim disk space.
+- 🛠️ **System Tools**: A collection of advanced utilities to purge shader caches, repair Pacman keyrings, rank mirrors, and synchronize package databases.
 - 📜 **Custom Scripts**: Execute your own custom bash scripts safely through a GUI, complete with live terminal output.
 - 🖌️ **Native Desktop Integration**: Inherits colors directly from Plasma, adjustable colors and radii. Tested with [KDE Material You Colors](https://github.com/luisbocanegra/kde-material-you-colors) . 
 

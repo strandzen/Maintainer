@@ -5,7 +5,7 @@ from PyQt6.QtCore import QObject, QAbstractListModel, Qt, pyqtProperty, pyqtSlot
 from models.task_model import TaskModel
 from tasks.command_task import CommandTask
 
-RECOMMENDED_CATEGORIES = ("clean_system", "maintain_system")
+RECOMMENDED_CATEGORIES = ("tools",)
 
 class CategoryModel(QAbstractListModel):
     IdRole = Qt.ItemDataRole.UserRole + 1
@@ -53,13 +53,11 @@ class TaskRegistry(QObject):
         self._recommended_tasks_model = None
         
         self._all_tasks = [] # Flat list of all tasks for extracting names
-        self._favorites_tasks_model = TaskModel(parent=parent)
         
         self.load_config(config_path, parent)
         self._recommended_tasks_model = self._createRecommendedTasksModel()
         
         if self._settings_manager is not None:
-            self._settings_manager.favoriteTasksChanged.connect(self._rebuild_favorites_model)
             self._rebuild_all_models()
         else:
             self._rebuild_all_models()
@@ -74,36 +72,6 @@ class TaskRegistry(QObject):
 
         self._category_data = data.get("categories", [])
         
-        # --- Auto-discover scripts ---
-        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        scripts_dir = os.path.join(project_root, "scripts")
-        
-        if os.path.exists(scripts_dir) and os.path.isdir(scripts_dir):
-            script_tasks = []
-            for filename in sorted(os.listdir(scripts_dir)):
-                if filename.endswith(".sh"):
-                    script_path = os.path.join(scripts_dir, filename)
-                    # Create a readable name from the filename: "my-script.sh" -> "My Script"
-                    name_base = filename[:-3].replace("-", " ").replace("_", " ")
-                    readable_name = name_base.title()
-                    
-                    script_tasks.append({
-                        "name": readable_name,
-                        "description": f"Runs the {filename} script.",
-                        "command": f"bash {script_path}",
-                        "type": "script",
-                        "is_recommended": False,
-                        "requires_privilege": False # Assume user scripts manage their own privilege if needed, or update later
-                    })
-            
-            if script_tasks:
-                self._category_data.append({
-                    "id": "custom_scripts",
-                    "name": "Custom Scripts",
-                    "icon": "custom_scripts", # Using the dedicated custom_scripts.svg icon
-                    "tasks": script_tasks
-                })
-        # -----------------------------
 
         self._category_model._categories = self._category_data
 
@@ -140,18 +108,6 @@ class TaskRegistry(QObject):
                         settings=self._settings_manager,
                         parent=self.parent()
                     )
-                elif task_type == "script":
-                    from tasks.script_task import ScriptTask
-                    task = ScriptTask(
-                        name=task_data["name"],
-                        description=task_data["description"],
-                        command=task_data.get("command", ""),
-                        is_recommended=task_data.get("is_recommended", False),
-                        is_advanced=task_data.get("is_advanced", False),
-                        requires_privilege=task_data.get("requires_privilege", False),
-                        settings=self._settings_manager,
-                        parent=self.parent()
-                    )
                 else:
                     task = CommandTask(
                         name=task_data["name"],
@@ -170,7 +126,6 @@ class TaskRegistry(QObject):
         # Rebuild derivative models
         if self._recommended_tasks_model:
             self._rebuild_recommended_model()
-        self._rebuild_favorites_model()
         self.allTasksChanged.emit()
 
     def _rebuild_recommended_model(self):
@@ -189,7 +144,7 @@ class TaskRegistry(QObject):
     @pyqtProperty(list, notify=allTasksChanged)
     def allowedFavoriteTaskNames(self):
         # Only show tasks from these specific categories
-        allowed_cats = ["clean_system", "maintain_system", "custom_scripts"]
+        allowed_cats = ["clean_system", "maintain_system"]
         names = []
         for cat_id in allowed_cats:
             model = self._task_models.get(cat_id)
@@ -200,18 +155,6 @@ class TaskRegistry(QObject):
                         names.append(task.name)
         return names
 
-    @pyqtProperty(QAbstractListModel, constant=True)
-    def favoritesTaskModel(self):
-        return self._favorites_tasks_model
-
-    def _rebuild_favorites_model(self):
-        if not self._settings_manager:
-            return
-        self._favorites_tasks_model.clear()
-        fav_names = self._settings_manager.favoriteTasks
-        for task in self._all_tasks:
-            if task.name in fav_names:
-                self._favorites_tasks_model.add_task(task)
 
     @pyqtProperty(QAbstractListModel, constant=True)
     def categories(self):

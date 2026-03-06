@@ -18,8 +18,7 @@ Rectangle {
     property bool isReady: !isRunning && !isFinished
     
     // Links to Center Pane
-    property bool isHomeActive: myPageStack && myPageStack.currentItem && myPageStack.currentItem.objectName === "landingPage" ? true : false
-    property var activeTaskModel: isHomeActive ? TaskRegistry.favoritesTaskModel : (myPageStack && myPageStack.currentItem ? myPageStack.currentItem.taskModel : null)
+    property var activeTaskModel: myPageStack && myPageStack.currentItem ? myPageStack.currentItem.taskModel : null
     property int selectedCount: activeTaskModel ? activeTaskModel.checkedCount : 0
     
     property bool isCompact: root.width < Kirigami.Units.gridUnit * 12
@@ -100,11 +99,11 @@ Rectangle {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
-            visible: root.isHomeActive && !isRunning && !isFinished
+            visible: !isRunning && !isFinished
             color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
         }
 
-        Kirigami.Separator { Layout.fillWidth: true; opacity: 0.5; visible: root.isHomeActive }
+        Kirigami.Separator { Layout.fillWidth: true; opacity: 0.5; visible: !isRunning && !isFinished }
         
         // --- READY STATE (CHECKBOX LIST OR APPIMAGE LIST) ---
         Rectangle {
@@ -258,6 +257,12 @@ Rectangle {
                     }
                 }
                 
+                Kirigami.Separator {
+                    Layout.fillHeight: true
+                    visible: readyScroll.visible
+                    opacity: 0.5
+                }
+                
                 ScrollBar {
                     id: readyScroll
                     Layout.fillHeight: true
@@ -369,6 +374,12 @@ Rectangle {
                     }
                 }
                 
+                Kirigami.Separator {
+                    Layout.fillHeight: true
+                    visible: runningScroll.visible
+                    opacity: 0.5
+                }
+                
                 ScrollBar {
                     id: runningScroll
                     Layout.fillHeight: true
@@ -417,55 +428,6 @@ Rectangle {
             }
         }
         
-        Button {
-            text: UIStrings.ui.landing.run_recommended
-            Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
-            visible: isReady && isHomeActive && selectedCount === 0
-            onClicked: {
-                var recommendedModel = TaskRegistry.recommendedTasksModel
-                if (recommendedModel) {
-                    var tasks = recommendedModel.get_checked_tasks()
-                    TaskEngine.start_tasks(tasks)
-                }
-            }
-            contentItem: Item {
-                anchors.fill: parent
-                Row {
-                    anchors.centerIn: parent
-                    spacing: Kirigami.Units.smallSpacing
-                    Kirigami.Icon {
-                        source: "media-playback-start"
-                        width: Kirigami.Units.iconSizes.smallMedium
-                        height: Kirigami.Units.iconSizes.smallMedium
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    Label {
-                        text: UIStrings.ui.landing.run_recommended
-                        color: Kirigami.Theme.textColor
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-            }
-            background: Rectangle {
-                color: parent.down ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.2) : 
-                       parent.hovered ? Qt.rgba(root.effectiveHighlight.r, root.effectiveHighlight.g, root.effectiveHighlight.b, 0.1) : "transparent"
-                border.color: root.effectiveHighlight
-                border.width: 1
-                radius: Kirigami.Units.smallSpacing
-            }
-        }
-
-        Label {
-            text: UIStrings.ui.landing.potential_savings + (TaskRegistry.recommendedTasksModel ? TaskRegistry.recommendedTasksModel.totalReclaimedSpaceStr : "")
-            font.pointSize: Kirigami.Theme.smallFont.pointSize
-            color: SettingsManager.emphasisColor !== "" ? SettingsManager.emphasisColor : Kirigami.Theme.highlightColor
-            Layout.alignment: Qt.AlignHCenter
-            visible: !root.isCompact && isReady && isHomeActive && selectedCount === 0 && TaskRegistry.recommendedTasksModel && TaskRegistry.recommendedTasksModel.totalPossibleReclaimedSpaceBytes > 0
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-            Layout.fillWidth: true
-        }
         
         Label {
             text: activeTaskModel && activeTaskModel.totalReclaimedSpaceStr ? activeTaskModel.totalReclaimedSpaceStr : ""

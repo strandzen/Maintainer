@@ -8,14 +8,6 @@
         "hidden": false
     },
     {
-        "id": "monitor",
-        "type": "page",
-        "name": "monitor",
-        "icon": "monitor",
-        "url": "pages/SystemMonitorPage.qml",
-        "hidden": false
-    },
-    {
         "id": "settings",
         "type": "page",
         "name": "settings",
@@ -35,22 +27,7 @@
         "hidden": false
     },
     {
-        "id": "clean_system",
-        "type": "category",
-        "hidden": false
-    },
-    {
         "id": "corpse_cleaner",
-        "type": "category",
-        "hidden": false
-    },
-    {
-        "id": "custom_scripts",
-        "type": "category",
-        "hidden": false
-    },
-    {
-        "id": "maintain_system",
         "type": "category",
         "hidden": false
     },
@@ -60,6 +37,11 @@
         "name": "Packages",
         "icon": "package_manager",
         "url": "pages/PackageManagerPage.qml",
+        "hidden": false
+    },
+    {
+        "id": "tools",
+        "type": "category",
         "hidden": false
     }
 ]

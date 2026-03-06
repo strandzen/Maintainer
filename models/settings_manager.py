@@ -6,9 +6,8 @@ class SettingsManager(QObject):
     packageCacheCountChanged = pyqtSignal()
     journalLogAgeChanged = pyqtSignal()
     ghostConfigBlacklistChanged = pyqtSignal()
-    favoriteTasksChanged = pyqtSignal()
     corpseCleanerCustomPathsChanged = pyqtSignal()
-    scriptsDirChanged = pyqtSignal()
+    aurHelperChanged = pyqtSignal()
     aurHelperChanged = pyqtSignal()
     checkUpdatesOnStartupChanged = pyqtSignal()
     emphasisColorChanged = pyqtSignal()
@@ -37,13 +36,8 @@ class SettingsManager(QObject):
             self.settings.setValue("journalLogAge", "2weeks")
         if not self.settings.contains("ghostConfigBlacklist"):
             self.settings.setValue("ghostConfigBlacklist", "obs-studio,kde,plasma")
-        if not self.settings.contains("favoriteTasks"):
-            self.settings.setValue("favoriteTasks", ["Clear Pacman Cache"])
         if not self.settings.contains("corpseCleanerCustomPaths"):
             self.settings.setValue("corpseCleanerCustomPaths", "")
-        if not self.settings.contains("scriptsDir"):
-            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            self.settings.setValue("scriptsDir", os.path.join(project_root, "scripts"))
         if not self.settings.contains("aurHelper"):
             self.settings.setValue("aurHelper", "pacman")
         if not self.settings.contains("checkUpdatesOnStartup"):
@@ -105,21 +99,6 @@ class SettingsManager(QObject):
             self.settings.setValue("ghostConfigBlacklist", value)
             self.ghostConfigBlacklistChanged.emit()
 
-    @pyqtProperty(list, notify=favoriteTasksChanged)
-    def favoriteTasks(self):
-        val = self.settings.value("favoriteTasks", [])
-        if isinstance(val, str):
-            return [val] if val else []
-        if val is None:
-            return []
-        return list(val)
-
-    @favoriteTasks.setter
-    def favoriteTasks(self, value):
-        # value comes in as a Javascript array (list in python)
-        if self.favoriteTasks != value:
-            self.settings.setValue("favoriteTasks", value)
-            self.favoriteTasksChanged.emit()
 
     @pyqtProperty(str, notify=corpseCleanerCustomPathsChanged)
     def corpseCleanerCustomPaths(self):
@@ -131,15 +110,6 @@ class SettingsManager(QObject):
             self.settings.setValue("corpseCleanerCustomPaths", str(value))
             self.corpseCleanerCustomPathsChanged.emit()
 
-    @pyqtProperty(str, notify=scriptsDirChanged)
-    def scriptsDir(self):
-        return str(self.settings.value("scriptsDir", ""))
-
-    @scriptsDir.setter
-    def scriptsDir(self, value):
-        if self.scriptsDir != value:
-            self.settings.setValue("scriptsDir", str(value))
-            self.scriptsDirChanged.emit()
 
     @pyqtProperty(str, notify=aurHelperChanged)
     def aurHelper(self):

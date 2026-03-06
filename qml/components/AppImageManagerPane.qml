@@ -35,6 +35,7 @@ Rectangle {
 
             TabButton {
                 text: "Manage"
+                Layout.fillWidth: true
                 contentItem: Label {
                     text: parent.text
                     horizontalAlignment: Text.AlignHCenter
@@ -50,6 +51,7 @@ Rectangle {
 
             TabButton {
                 text: "Browse"
+                Layout.fillWidth: true
                 contentItem: Label {
                     text: parent.text
                     horizontalAlignment: Text.AlignHCenter

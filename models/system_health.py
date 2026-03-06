@@ -6,67 +6,6 @@ from collections import deque
 import psutil
 from PyQt6.QtCore import QObject, pyqtProperty, pyqtSignal, pyqtSlot, QTimer, QThread, QAbstractListModel, Qt, QModelIndex
 
-class ProcessModel(QAbstractListModel):
-    PidRole = Qt.ItemDataRole.UserRole + 1
-    NameRole = Qt.ItemDataRole.UserRole + 2
-    UserRole = Qt.ItemDataRole.UserRole + 3
-    CpuRole = Qt.ItemDataRole.UserRole + 4
-    MemoryRole = Qt.ItemDataRole.UserRole + 5
-    ExeRole = Qt.ItemDataRole.UserRole + 6
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self._processes = []
-        self._pid_to_row = {}
-
-    def rowCount(self, parent=QModelIndex()):
-        return len(self._processes)
-
-    def data(self, index, role):
-        if not index.isValid() or not (0 <= index.row() < len(self._processes)):
-            return None
-        
-        proc = self._processes[index.row()]
-        if role == self.PidRole: return proc.get("pid")
-        if role == self.NameRole: return proc.get("name")
-        if role == self.UserRole: return proc.get("user")
-        if role == self.CpuRole: return proc.get("cpu")
-        if role == self.MemoryRole: return proc.get("memory")
-        if role == self.ExeRole: return proc.get("exe")
-        return None
-
-    def roleNames(self):
-        return {
-            self.PidRole: b"pid",
-            self.NameRole: b"name",
-            self.UserRole: b"user",
-            self.CpuRole: b"cpu",
-            self.MemoryRole: b"memory",
-            self.ExeRole: b"exe"
-        }
-
-    def update_processes(self, new_procs):
-        # We want to minimize resets to preserve scroll position.
-        # This is a simplified but effective way: 
-        # If the set of PIDs is drastically different or size changed, reset.
-        # Otherwise, update existing rows.
-        
-        new_pids = [p['pid'] for p in new_procs]
-        old_pids = [p['pid'] for p in self._processes]
-        
-        if len(new_procs) != len(self._processes) or set(new_pids) != set(old_pids):
-            self.beginResetModel()
-            self._processes = new_procs
-            self._pid_to_row = {p['pid']: i for i, p in enumerate(new_procs)}
-            self.endResetModel()
-        else:
-            # Update values for existing PIDs
-            for i, p in enumerate(new_procs):
-                old_p = self._processes[i]
-                if old_p['cpu'] != p['cpu'] or old_p['memory'] != p['memory']:
-                    self._processes[i] = p
-                    idx = self.index(i, 0)
-                    self.dataChanged.emit(idx, idx, [self.CpuRole, self.MemoryRole])
 
 class StorageScannerWorker(QThread):
     result = pyqtSignal(dict) # Dict with sizes in bytes: 'apps', 'media', 'games', 'downloads', 'vms', 'trash_cache', 'other', 'total_used', 'total'
@@ -157,7 +96,6 @@ class SystemHealth(QObject):
     cpuUsageChanged = pyqtSignal()
     swapUsageChanged = pyqtSignal()
     networkUsageChanged = pyqtSignal()
-    applicationsChanged = pyqtSignal()
     cpuHistoryChanged = pyqtSignal()
     ramHistoryChanged = pyqtSignal()
     networkHistoryChanged = pyqtSignal()
@@ -176,8 +114,6 @@ class SystemHealth(QObject):
         self._netDownload = 0.0
         self._netUpload = 0.0
         self._ipv4Address = self._get_ipv4()
-        self._process_model = ProcessModel(self)
-        self._searchQuery = ""
         
         self._sort_column = "cpu"
         self._sort_ascending = False
@@ -213,15 +149,8 @@ class SystemHealth(QObject):
         self._medium_timer.timeout.connect(self._update_medium_metrics)
         self._medium_timer.start(3000)
 
-        self._app_timer = QTimer(self)    # Process list: 5 s
-        self._app_timer.timeout.connect(self._update_applications)
-        self._app_timer.start(5000)
+        self._medium_timer.start(3000)
 
-        # Debounce timer for search query changes
-        self._search_timer = QTimer(self)
-        self._search_timer.setSingleShot(True)
-        self._search_timer.setInterval(300)
-        self._search_timer.timeout.connect(self._update_applications)
 
         self._storage_cat_timer = QTimer(self)
         self._storage_cat_timer.timeout.connect(self._fetch_storage_categories)
@@ -230,7 +159,6 @@ class SystemHealth(QObject):
         # Initial fetch
         self._update_fast_metrics()
         self._update_medium_metrics()
-        self._update_applications()
         self._fetch_storage_categories()
 
     def _fetch_storage_categories(self):
@@ -329,99 +257,6 @@ class SystemHealth(QObject):
         except Exception:
             pass
 
-    def _update_applications(self):
-        try:
-            procs = []
-            current_pids = set()
-            search_lower = self._searchQuery.lower()
-            
-            for p in psutil.process_iter(['pid', 'name', 'memory_info', 'username', 'exe']):
-                try:
-                    pid = p.info['pid']
-                    current_pids.add(pid)
-                    if pid not in self._proc_cache:
-                        self._proc_cache[pid] = p
-                        p.cpu_percent()
-                        cpu = 0.0
-                    else:
-                        cpu = self._proc_cache[pid].cpu_percent()
-                    
-                    name_str = p.info['name'] or "Unknown"
-                    user_str = p.info['username'] or "Unknown"
-                    
-                    if search_lower and search_lower not in name_str.lower() and search_lower not in user_str.lower() and search_lower != str(pid):
-                        continue
-                        
-                    mem_bytes = p.info['memory_info'].rss
-                    procs.append({
-                        "pid": pid,
-                        "name": name_str,
-                        "user": user_str,
-                        "exe": p.info['exe'] or "",
-                        "cpu_val": cpu,
-                        "cpu": f"{cpu:.1f}%",
-                        "mem_val": mem_bytes,
-                        "memory": f"{mem_bytes / (1024*1024):.1f} MiB"
-                    })
-                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess, KeyError):
-                    pass
-            
-            dead_pids = set(self._proc_cache.keys()) - current_pids
-            for pid in dead_pids:
-                del self._proc_cache[pid]
-                
-            sort_key = {
-                "cpu":    lambda x: x['cpu_val'],
-                "memory": lambda x: x['mem_val'],
-                "name":   lambda x: x['name'].lower(),
-                "user":   lambda x: x['user'].lower(),
-                "pid":    lambda x: x['pid'],
-            }.get(self._sort_column, lambda x: x['cpu_val'])
-            top_procs = sorted(procs, key=sort_key, reverse=not self._sort_ascending)[:50]
-            
-            formatted_procs = []
-            for p in top_procs:
-                formatted_procs.append({
-                    "pid": p['pid'],
-                    "name": p['name'],
-                    "user": p['user'],
-                    "exe": p['exe'],
-                    "cpu": p['cpu'],
-                    "memory": p['memory']
-                })
-            
-            self._process_model.update_processes(formatted_procs)
-        except Exception:
-            pass
-
-    @pyqtSlot(str)
-    def toggleSort(self, column):
-        if self._sort_column == column:
-            self._sort_ascending = not self._sort_ascending
-        else:
-            self._sort_column = column
-            self._sort_ascending = column in ("name", "user", "pid")
-        self.sortChanged.emit()
-        self._update_applications()
-
-    @pyqtSlot(int)
-    def kill_process(self, pid):
-        try:
-            p = psutil.Process(pid)
-            p.terminate()
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            pass
-
-    @pyqtSlot(int)
-    def open_file_location(self, pid):
-        try:
-            p = psutil.Process(pid)
-            exe_path = p.exe()
-            if exe_path:
-                dir_path = os.path.dirname(exe_path)
-                subprocess.Popen(['xdg-open', dir_path])
-        except (psutil.NoSuchProcess, psutil.AccessDenied, OSError):
-            pass
 
     @pyqtProperty(float, notify=ramUsageChanged)
     def ramUsage(self): return self._ramUsage
@@ -483,15 +318,4 @@ class SystemHealth(QObject):
     @pyqtProperty(list, notify=networkHistoryChanged)
     def netUpHistory(self): return list(self._net_up_history)
 
-    @pyqtProperty(QObject, notify=applicationsChanged)
-    def applications(self): return self._process_model
-
-    @pyqtProperty(str, notify=applicationsChanged)
-    def searchQuery(self): return self._searchQuery
-    
-    @searchQuery.setter
-    def searchQuery(self, val):
-        if self._searchQuery != val:
-            self._searchQuery = val
-            self._search_timer.start()
 

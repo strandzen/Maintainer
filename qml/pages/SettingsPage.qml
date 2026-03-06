@@ -53,11 +53,6 @@ Kirigami.ScrollablePage {
                 opacity: 0.3
             }
 
-            Button {
-                Kirigami.FormData.label: "Favorite Tasks"
-                text: "Select Favorites..."
-                onClicked: favoriteTasksSheet.open()
-            }
 
             // --- SECTION: Package Manager ---
             Label {
@@ -156,28 +151,6 @@ Kirigami.ScrollablePage {
                 onEditingFinished: SettingsManager.corpseCleanerCustomPaths = text
             }
 
-            // --- SECTION: Custom Scripts ---
-            Label {
-                Kirigami.FormData.isSection: true
-                text: "Custom Scripts"
-                font.bold: true
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-                Layout.topMargin: Kirigami.Units.largeSpacing
-            }
-            Kirigami.Separator {
-                Kirigami.FormData.isSection: true
-                Layout.fillWidth: true
-                opacity: 0.3
-            }
-
-            TextField {
-                Kirigami.FormData.label: UIStrings.ui.settings.label_scripts_dir
-                Layout.fillWidth: true
-                text: SettingsManager.scriptsDir
-                placeholderText: UIStrings.ui.settings.placeholder_scripts_dir
-                onEditingFinished: SettingsManager.scriptsDir = text
-            }
 
             // --- SECTION: UI ---
             Label {
@@ -368,52 +341,4 @@ Kirigami.ScrollablePage {
         }
     }
 
-    Kirigami.OverlaySheet {
-        id: favoriteTasksSheet
-        title: UIStrings.ui.settings.favorite_tasks_title
-        implicitWidth: Kirigami.Units.gridUnit * 28
-        
-        ListView {
-            id: favList
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 26
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 20
-            implicitHeight: Layout.preferredHeight
-            clip: true
-            model: TaskRegistry.allowedFavoriteTaskNames
-            
-            delegate: CheckDelegate {
-                width: favList.width
-                text: modelData
-                checked: {
-                    var favs = SettingsManager.favoriteTasks
-                    if (!favs || typeof favs === "undefined") return false
-                    for (var i = 0; i < favs.length; i++) {
-                        if (String(favs[i]) === String(modelData)) return true
-                    }
-                    return false
-                }
-                onToggled: {
-                    var arr = []
-                    var currentFavs = SettingsManager.favoriteTasks
-                    if (currentFavs) {
-                        for (var i = 0; i < currentFavs.length; i++) {
-                            arr.push(String(currentFavs[i]))
-                        }
-                    }
-                    
-                    var taskName = String(modelData)
-                    var idx = arr.indexOf(taskName)
-                    if (checked && idx === -1) {
-                        arr.push(taskName)
-                    } else if (!checked && idx !== -1) {
-                        arr.splice(idx, 1)
-                    }
-                    SettingsManager.favoriteTasks = arr
-                }
-            }
-            
-            ScrollBar.vertical: ScrollBar {}
-        }
-    }
 }
